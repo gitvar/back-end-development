@@ -35,3 +35,5 @@
  end
 
 Kernel.puts("The answer is #{answer}")
+
+Kernel.puts("Extra puts added for git test purposes!")

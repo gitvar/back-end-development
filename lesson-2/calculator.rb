@@ -20,6 +20,7 @@
  Kernel.puts("What operation is required? : 1) +  2) -  3) *  4) / ")
  operator = Kernel.gets().chomp()
 
+```ruby
  case
  when operator == '1'
    answer = number1.to_i() + number2.to_i()
@@ -35,7 +36,7 @@
  end
 
 Kernel.puts("The answer is #{answer}")
-
+```
 #Kernel.puts("Extra puts added for git test purposes!")
 
 #Kernel.puts("Append this new line, also for test purposes - at the source (GitHub).)

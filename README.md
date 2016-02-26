@@ -6,4 +6,4 @@
 |----------|----------
 |    10    |  20    
 |    30    |   40
-| ** 90 Persentage**  | **--100 Percentage--**
+| ** 90 Persentage**  | **__100 Percentage__**

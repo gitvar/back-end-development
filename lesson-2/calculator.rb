@@ -39,3 +39,5 @@ Kernel.puts("The answer is #{answer}")
 #Kernel.puts("Extra puts added for git test purposes!")
 
 #Kernel.puts("Append this new line, also for test purposes - at the source (GitHub).)
+
+# new comment.

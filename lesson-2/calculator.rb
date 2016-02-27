@@ -63,7 +63,7 @@ loop do
   end
 
   prompt("What operation is required? : 1) +  2) -  3) *  4) / ")
-  operator_prompt = <<~MSG
+  operator_prompt = <<-MSG
   What operation is required?
     1) Addition
     2) Subtraction

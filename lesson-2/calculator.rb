@@ -8,6 +8,8 @@
  #
  # Use the Kernel.gets() method to retrieve user input, and use Kernel.puts() method to display output. Remember that Kernel.gets() includes the newline, so you have to call chomp() to remove it: Kernel.gets().chomp().
 
+require 'pry'
+
  Kernel.puts("Hi, I am a calculator program! Please give me two numbers...")
 
  Kernel.puts("What is the first number?")
@@ -33,5 +35,7 @@
    Kernel.puts("I cannot perform that operation, sorry!")
    exit
  end
+
+# binding.pry
 
 Kernel.puts("The answer is #{answer}")

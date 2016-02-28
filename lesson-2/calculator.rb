@@ -11,26 +11,48 @@
 # it: Kernel.gets().chomp().
 
 require 'pry'
+require 'yaml'
+
+MESSAGES = YAML.load_file('calculator_messages.yml')
+
+# puts MESSAGES.inspect
 
 def prompt(message = " ")
   Kernel.puts("=> #{message}")
 end
 
+def float?(num)
+  Float(num) rescue false
+end
+
+def integer?(num)
+  Integer(num) rescue false
+end
+
 def valid?(num)
-  num.to_i() != 0
+  integer?(num) || float?(num)
+  # puts "Integers:"
+  # puts num.to_i
+  # puts num.to_i.to_s
+  # puts "Floats:"
+  # puts num.to_f
+  # puts num.to_f.to_s
+  # num.to_i.to_s == num || num.to_f.to_s == num
 end
 
 def operation_to_message(op)
-  case op
-  when '1'
-    'Adding'
-  when '2'
-    'Subtracting'
-  when '3'
-    'Multiplying'
-  when '4'
-    'Dividing'
-  end
+  result =  case op
+            when '1'
+              MESSAGES['add']
+            when '2'
+              MESSAGES['sub']
+            when '3'
+              MESSAGES['mul']
+            when '4'
+              MESSAGES['div']
+            end
+  # More code here if required.
+  result
 end
 
 name = ''
@@ -38,48 +60,51 @@ number1 = ''
 number2 = ''
 operator = ''
 
-prompt("Hi, I am a calculator program! Please enter your name.")
+prompt(MESSAGES['welcome'])
 loop do
   name = Kernel.gets().chomp()
   break unless name.empty?
-  prompt("Hmmm... Please anter a valid name.")
+  prompt(MESSAGES['valid_name'])
 end
 
-prompt("Hello #{name}, please give me two numbers to work with:")
+prompt(MESSAGES['hello'] % {:name=>name})
+prompt(MESSAGES['request_numbers'])
 
 loop do
   loop do
-    prompt("What is the first number?")
+    prompt(MESSAGES['first_num'])
     number1 = Kernel.gets().chomp()
     break if valid?(number1)
-    prompt("Hmmm... That doesn't look right. Try again ...")
+    prompt(MESSAGES['invalid_entry'])
   end
 
   loop do
-    prompt("What is the second number?")
+    prompt(MESSAGES['second_num'])
     number2 = Kernel.gets().chomp()
     break if valid?(number2)
-    prompt("Hmmm... That doesn't look right. Try again ...")
+    prompt(MESSAGES['invalid_entry'])
   end
 
-  prompt("What operation is required? : 1) +  2) -  3) *  4) / ")
-  operator_prompt = <<-MSG
-  What operation is required?
-    1) Addition
-    2) Subtraction
-    3) Multiplication
-    4) Division
-   MSG
+  operator_prompt = MESSAGES['operation_request']
+
+  # <<-MSG
+  # What operation is required?
+  #   1) Addition
+  #   2) Subtraction
+  #   3) Multiplication
+  #   4) Division
+  #  MSG
 
   prompt(operator_prompt)
   loop do
     operator = Kernel.gets().chomp()
     break if %w(1 2 3 4).include?(operator)
-    prompt("Choose only 1, 2, 3 or 4 please #{name}.")
+    prompt(MESSAGES['operation_choices'])
   end
 
-  prompt("#{operation_to_message(operator)} the numbers #{number1} and #{number2}")
-
+  #prompt("#{operation_to_message(operator)} the numbers #{number1} and #{number2}")
+  op_to_message = "#{operation_to_message(operator)}"
+  prompt(MESSAGES['operation_announcement'] % { :op => op_to_message, :number1 => number1, :number2 => number2 })
   answer =  case operator
             when '1'
               number1.to_i() + number2.to_i()
@@ -88,15 +113,19 @@ loop do
             when '3'
               number1.to_i() * number2.to_i()
             when '4'
-              number1.to_f() / number2.to_f()
+              if number2.to_f == 0
+                prompt(MESSAGES['divide_by_zero'])
+              else
+                number1.to_f() / number2.to_f()
+              end
             end
 
   # binding.pry
 
-  prompt("The answer is #{answer}")
-  prompt("Again? (Y) to continue")
+  prompt(MESSAGES['answer'] % {:answer => answer})
+  prompt(MESSAGES['continue'])
   input = Kernel.gets().chomp()
-  break unless input.downcase().start_with?("y")
+  break unless input.downcase().start_with?(MESSAGES['continue_answer_starts_with_y'])
 end
 
-prompt("Thanks for using 'calulator.rb', #{name}. Goodbye!")
+prompt(MESSAGES['goodbye_message'])

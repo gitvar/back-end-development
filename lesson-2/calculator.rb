@@ -1,5 +1,7 @@
 # calculator.rb
 
+LANGUAGE = 'af'
+
 # Build a command line calculator program that does the following:
 #
 #     asks for two numbers
@@ -13,9 +15,12 @@
 require 'pry'
 require 'yaml'
 
-MESSAGES = YAML.load_file('calculator_messages.yml')
-
-# puts MESSAGES.inspect
+case LANGUAGE
+when 'en'
+  MESSAGES = YAML.load_file('calculator_messages_english.yml')
+when 'af'
+  MESSAGES = YAML.load_file('calculator_messages_afrikaans.yml')
+end
 
 def prompt(message = " ")
   Kernel.puts("=> #{message}")
@@ -31,13 +36,6 @@ end
 
 def valid?(num)
   integer?(num) || float?(num)
-  # puts "Integers:"
-  # puts num.to_i
-  # puts num.to_i.to_s
-  # puts "Floats:"
-  # puts num.to_f
-  # puts num.to_f.to_s
-  # num.to_i.to_s == num || num.to_f.to_s == num
 end
 
 def operation_to_message(op)

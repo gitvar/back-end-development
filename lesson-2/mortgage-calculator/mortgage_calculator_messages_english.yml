@@ -1,0 +1,18 @@
+# mortgage_calculator_messages_english.yml
+
+welcome: "Welcome to the mortgage calculator program! Please enter your name."
+invalid_name: "Hmmm... Please anter a valid name."
+hello_name: 'Hello, %{name}.'
+intro1: "I can calculate your monthly mortgage payment for you."
+heading1: "Mortgage Calculator:"
+underline_heading1: "===================="
+loan_amount: "What is the required Loan Amount in Dollars?"
+invalid_entry: "Hmmm... That doesn't look right. Try again ..."
+annual_percentage_rate: "What is the Annual Percentage Rate (Enter 5% as 5 please)?"
+loan_duration_years: "What is the full loan duration in years?"
+calculating: "Calculating the fixed monthly payment ..."
+monthly_payment: "The fixed monthly payment will be: $%{fixed_monthly_payment}"
+divide_by_zero: "Cannot divide by Zero!"
+continue: "Again? (Y) to continue"
+continue_answer_starts_with_y: "y"
+goodbye_message: "Thanks for using the mortgage_calulator. Goodbye!"

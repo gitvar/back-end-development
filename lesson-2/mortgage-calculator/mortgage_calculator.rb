@@ -74,7 +74,7 @@ name = ''
 loan_amount = 0.0
 annual_percentage_rate = 0.0
 monthly_interest_rate = 0.0
-loan_duration_years = 0.0
+loan_duration_years = 0
 loan_duration_months = 0.0
 fixed_monthly_payment = 0.0
 
@@ -102,7 +102,7 @@ loop do
   loop do
     prompt_1('loan_amount')
     loan_amount = gets.chomp.to_f
-    break if valid?(loan_amount)
+    break if (valid?(loan_amount) && loan_amount > 0)
     prompt_1('invalid_entry')
   end
 
@@ -111,7 +111,7 @@ loop do
   loop do
     prompt_1('annual_percentage_rate')
     annual_percentage_rate = gets.chomp.to_f
-    break if valid?(annual_percentage_rate)
+    break if (valid?(annual_percentage_rate) && annual_percentage_rate > 0)
     prompt_1('invalid_entry')
   end
 
@@ -120,7 +120,7 @@ loop do
   loop do
     prompt_1('loan_duration_years')
     loan_duration_years = gets.chomp.to_f
-    break if valid?(loan_duration_years)
+    break if (valid?(loan_duration_years) && loan_duration_years > 0)
     prompt_1('invalid_entry')
   end
 

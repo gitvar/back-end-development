@@ -119,7 +119,7 @@ loop do
 
   loop do
     prompt_1('loan_duration_years')
-    loan_duration_years = gets.chomp.to_f
+    loan_duration_years = gets.chomp.to_i
     break if (valid?(loan_duration_years) && loan_duration_years > 0)
     prompt_1('invalid_entry')
   end

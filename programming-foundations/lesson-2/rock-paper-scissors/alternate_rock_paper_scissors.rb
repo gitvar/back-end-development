@@ -27,7 +27,9 @@ def calculate_result(player, computer)
 end
 
 loop do
+
   choice = ''
+
   loop do
     prompt("Please choose one: #{VALID_CHOICES.join(", ")}")
     choice = Kernel.gets().chomp().downcase()
@@ -37,6 +39,7 @@ loop do
 
   computer_choice = VALID_CHOICES.sample
   prompt("You chose: #{choice}; Computer chose: #{computer_choice}.")
+
   puts calculate_result(choice, computer_choice)
 
   prompt("Play again? (Y) to continue ...")

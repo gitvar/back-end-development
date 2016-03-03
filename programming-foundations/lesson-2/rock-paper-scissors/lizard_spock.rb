@@ -46,6 +46,7 @@ loop do
   loop do
     prompt("Please choose one: #{VALID_CHOICES_DISPLAY.join(', ')}")
     choice = Kernel.gets().chomp().downcase()
+    choice = choice[0]
     break if VALID_ABBREVIATED_CHOICES.include?(choice)
     prompt('That\'s not a valid choice. Try again.')
   end

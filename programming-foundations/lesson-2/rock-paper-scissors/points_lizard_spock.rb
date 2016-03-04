@@ -34,30 +34,67 @@ def win?(player, computer)
   false
 end
 
-def display_results(player, computer)
-  prompt("You chose: #{player.capitalize}; Computer chose: #{computer.capitalize}.")
-
-  if win?(player, computer)
-    prompt('You win!')
-  elsif player == computer
-    prompt("It's a tie!")
+def we_have_a_winner?(player_points, computer_points)
+  if player_points >= 5
+    prompt("You win the game #{player_points} to #{computer_points}!")
+  elsif computer_points >= 5
+    prompt("Computer wins the game #{computer_points} to #{player_points}!")
   else
-    prompt('Computer wins!')
+    return false
+  end
+  true
+end
+
+def display_round_result(result, player_choice, computer_choice)
+  prompt("You chose: #{VALID_CHOICES_HASH[player_choice.chr].capitalize}, Computer chose: #{computer_choice.capitalize}.")
+  if result == 'player'
+    prompt('You win the round!')
+  elsif result == 'tie'
+    prompt('The round is a tie!')
+  else
+    prompt('Computer wins the round!')
   end
 end
 
-# Main Loop starts here:
-loop do
-  player_choice = ''
-  loop do
-    display_valid_choices()
-    player_choice = Kernel.gets().chomp().downcase().chr
-    break if valid?(player_choice)
-    prompt("That's not a valid choice. Try again.")
+def calculate_round_result(player, computer)
+  if win?(player, computer)
+    'player'
+  elsif player == computer
+    'tie'
+  else
+    'computer'
   end
+end
 
-  computer_choice = VALID_CHOICES.sample
-  display_results(VALID_CHOICES_HASH[player_choice], computer_choice)
+loop do # main loop
+  player_choice = ''
+  player_score = 0
+  computer_score = 0
+
+  prompt('First one to 5 points wins!')
+
+  loop do # round loop
+    prompt("Player score = #{player_score} : Computer score = #{computer_score}")
+    loop do # valid entry loop
+      display_valid_choices()
+      player_choice = Kernel.gets().chomp().downcase()
+      break if valid?(player_choice.chr)
+      prompt("That's not a valid choice. Try again.")
+    end
+
+    computer_choice = VALID_CHOICES.sample
+
+    round_result = calculate_round_result(VALID_CHOICES_HASH[player_choice.chr], computer_choice)
+    display_round_result(round_result, player_choice, computer_choice)
+
+    if round_result == 'player'
+      player_score += 1
+    elsif round_result == 'computer'
+      computer_score += 1
+    end # if round_result == 'tie' do nothing ...
+
+    break if we_have_a_winner?(player_score, computer_score)
+  end
 
   prompt("'Enter' to play again, 's' to stop.")
   play_again = Kernel.gets().chomp().downcase()

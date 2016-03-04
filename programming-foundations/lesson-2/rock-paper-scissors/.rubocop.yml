@@ -4,8 +4,8 @@ Style/MethodCallParentheses:
   StyleGuide: 'https://github.com/bbatsov/ruby-style-guide#no-args-no-parens'
 
 Style/BracesAroundHashParameters:
-  Enabled: false
-  EnforcedStyle: no_braces
+  Enabled: true
+  EnforcedStyle: braces
   SupportedStyles:
   # The `braces` style enforces braces around all method parameters that are
   # hashes.
@@ -26,7 +26,7 @@ Style/CommentAnnotation:
   Enabled: false
 
 Style/StringLiterals:
-  Enabled: false
+  Enabled: true
   EnforcedStyle: single_quotes
   SupportedStyles:
   - single_quotes

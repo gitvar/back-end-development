@@ -34,7 +34,7 @@ def win?(player, computer)
   false
 end
 
-def we_have_a_winner?(player_points, computer_points)
+def we_have_a_game_winner?(player_points, computer_points)
   if player_points >= 5
     prompt("You win the game #{player_points} to #{computer_points}!")
   elsif computer_points >= 5
@@ -93,7 +93,7 @@ loop do # main loop
       computer_score += 1
     end # if round_result == 'tie' do nothing ...
 
-    break if we_have_a_winner?(player_score, computer_score)
+    break if we_have_a_game_winner?(player_score, computer_score)
   end
 
   prompt("'Enter' to play again, 's' to stop.")

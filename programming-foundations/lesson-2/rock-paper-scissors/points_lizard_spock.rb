@@ -45,14 +45,14 @@ def we_have_a_winner?(player_points, computer_points)
   true
 end
 
-def display_round_result(result, player_choice, computer_choice)
+def display_round_result(winner, player_choice, computer_choice)
   prompt("You chose: #{VALID_CHOICES_HASH[player_choice.chr].capitalize}, Computer chose: #{computer_choice.capitalize}.")
-  if result == 'player'
+  if winner == 'player'
     prompt('You win the round!')
-  elsif result == 'tie'
-    prompt('The round is a tie!')
-  else
+  elsif winner == 'computer'
     prompt('Computer wins the round!')
+  else
+    prompt('The round is a tie!')
   end
 end
 
@@ -84,12 +84,12 @@ loop do # main loop
 
     computer_choice = VALID_CHOICES.sample
 
-    round_result = calculate_round_result(VALID_CHOICES_HASH[player_choice.chr], computer_choice)
-    display_round_result(round_result, player_choice, computer_choice)
+    round_winner = calculate_round_result(VALID_CHOICES_HASH[player_choice.chr], computer_choice)
+    display_round_result(round_winner, player_choice, computer_choice)
 
-    if round_result == 'player'
+    if round_winner == 'player'
       player_score += 1
-    elsif round_result == 'computer'
+    elsif round_winner == 'computer'
       computer_score += 1
     end # if round_result == 'tie' do nothing ...
 

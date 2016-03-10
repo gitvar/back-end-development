@@ -10,34 +10,37 @@ munsters = {
   "Marilyn" => { "age" => 23, "gender" => "female"}
 }
 
-str = 'This is a string'
-arr = ['This', 'is', 'an', 'array']
+# Only way to really make this method NOT mutate the caller - with serialisation.
+def mess_with_demographics(m_hash)
+  serialized_data = Marshal.dump(m_hash)
+  demo_hash = Marshal.load(serialized_data)
 
-def my_tricky_method(a_string_param, an_array_param)
-  a_string_param[0] += "r"
-  an_array_param[0] += "rutabaga"
+  demo_hash.values.each do |family_member|
+    family_member["age"] += 42
+    family_member["gender"] = "other"
+  end
+return demo_hash
 end
 
-def mess_with_demographics(demo_hash)
-  demo_hash.values.each do |family_member|
+def mess_with_demographics!(m_hash)
+  m_hash.values.each do |family_member|
     family_member["age"] += 42
     family_member["gender"] = "other"
   end
 end
 
 # After writing this method, he typed the following...and before Grandpa could stop him, he hit the Enter key with his tail:
-
-mess_with_demographics(munsters)
+puts "Initial Value: #{munsters}"
+puts "Return of non-bang method: #{mess_with_demographics(munsters)}"
+puts "After non-bang method: #{munsters}"
+mess_with_demographics!(munsters)
+puts "After call to bang method: #{munsters}"
 
 # Did the family's data get ransacked, or did the mischief only mangle a local copy of the original hash? (why?)
 
-# Answer: Local copy mangled. Assignment inside mess_with_demographics method results in new varaible to be created, thereby not affecting the original data.
+# Answer: WRONG*** Local copy mutated. Assignment inside mess_with_demographics method results in new varaible to be created, thereby not affecting the original data. ***WRONG
 
-my_tricky_method(str, arr)
-p str, arr
-p munsters
-
-# I got this one completely wrong! Mainly because the method works directly on the data of the hash object passed in (no re-assignment takes place). As an example where re-assignment does take place, look at the non-bang tricky_method in exercise_3.rb (medium-2). Because of re-assignment (using the + method), a new object is created in memory space, with the variable pointing to that new memory space. Hence, the original is not changed or mutated.
+# Short answer: []= mutates the caller.
 
 # Launch School Answer:
 # Why? Remember that in Ruby, what gets passed in the parameter list is not what it appears. Under the hood, ruby passes the object id of each item rather than the value of the parameter. The method internally stores these object id's in locally scoped (private to the method) variables (named per the method definition's parameter list).

@@ -6,6 +6,7 @@
 #
 # Help Ben fix his code.
 
+# My Answer:
 def is_a_number?(num)
     num.to_f.to_s == num.to_s || num.to_i.to_s == num.to_s
 end

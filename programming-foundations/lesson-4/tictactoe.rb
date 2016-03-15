@@ -24,6 +24,9 @@ end
 # Step 1: Display the empty board.
 def display_board(brd)
   system 'clear'          # For Mac Terminal
+  puts
+  puts
+  puts "Player: #{PLAYER_MARKER}  Computer: #{COMPUTER_MARKER}"
   puts ''
   puts ''
   puts '     |     |'

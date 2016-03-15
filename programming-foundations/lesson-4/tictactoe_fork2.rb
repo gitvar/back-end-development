@@ -56,7 +56,7 @@ def player_places_piece!(brd)
     prompt("Choose a square [#{empty_squares(brd).join(', ')}]")
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
-    puts "That is not a valid entry. Try again."
+    prompt "That is not a valid entry. Try again."
   end
   brd[square] = PLAYER_MARKER
 end
@@ -68,11 +68,11 @@ end
 
 def someone_won?(brd)
   winning_patterns = { 1 => [1, 2, 3], 2 => [4, 5, 6], 3 => [7, 8, 9], 4=> [1, 5, 9],
-                        5 => [3, 5, 7], 6 => [1, 4, 7], 7 => [3, 6, 9] }
+                        5 => [3, 5, 7], 6 => [2, 5, 8], 7 => [1, 4, 7], 8 => [3, 6, 9] }
 
   # loop each pattern (if brd[winning_patterns[n]] == PLAYER_MARKER -> inc cntr)
   # if cntr == 3 winner is player.
-  
+
   winning_patterns.each_value do |pattern|
     cntr1 = 0
     cntr2 = 0
@@ -99,4 +99,4 @@ loop do
   break if someone_won?(board) || board_full?(board)
 end
 
-puts "#{someone_won?(board)}"
+prompt "#{someone_won?(board)}"

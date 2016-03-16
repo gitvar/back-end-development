@@ -84,8 +84,7 @@ def someone_won?(brd)
 end
 
 def check_winner(brd, line, marker)
-  brd.values_at(line[0], line[1], line[2]).count(marker) == 3
-  # brd.values_at(*line).count(marker) == 3
+  brd[line[0]] == marker && brd[line[1]] == marker && brd[line[2]] == marker
 end
 
 def detect_winner(brd)
@@ -116,7 +115,7 @@ loop do
     prompt "It's a tie!"
   end
   puts ""
-  prompt "Play again? (y or n)."
+  prompt "Play again? (Y or any other key to quit)."
   continue = gets.chomp.downcase
   break if !continue.start_with?("y")
 end

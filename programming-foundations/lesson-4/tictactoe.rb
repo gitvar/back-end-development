@@ -84,8 +84,8 @@ def someone_won?(brd)
 end
 
 def check_winner(brd, line, marker)
-  brd.values_at(line[0], line[1], line[2]).count(marker) == 3
-  # brd.values_at(*line).count(marker) == 3
+  # brd.values_at(line[0], line[1], line[2]).count(marker) == 3
+  brd.values_at(*line).count(marker) == 3
 end
 
 def detect_winner(brd)

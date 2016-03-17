@@ -1,4 +1,4 @@
-# tictactoe.rb
+# tictactoe_fork1.rb
 
 # 1. Display the initial empty 3x3 board.
 # 2. Ask the user to mark a square.

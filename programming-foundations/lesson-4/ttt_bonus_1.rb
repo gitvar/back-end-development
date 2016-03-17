@@ -1,15 +1,6 @@
-# tictactoe_fork3.rb
+# ttt_bonus_1.rb
 
-# 1. Display the initial empty 3x3 board.
-# 2. Ask the user to mark a square.
-# 3. Computer marks a square.
-# 4. Display the updated board state.
-# 5. If winner, display winner.
-# 6. If board is full, display tie.
-# 7. If neither winner nor board is full, go to #2
-# 8. Play again?
-# 9. If yes, go to #1
-# 10. Good bye!
+# Improved "join"
 
 require 'pry'
 
@@ -19,6 +10,8 @@ COMPUTER_MARKER = 'O'.freeze
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                 [[1, 5, 9], [3, 5, 7]].freeze
+SEPARATOR = ', '.freeze
+END_WORD = 'or'.freeze
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -29,21 +22,28 @@ def display_board(brd)
   system 'clear' # For Mac Terminal
   puts
   puts
-  puts "Player: #{PLAYER_MARKER}  Computer: #{COMPUTER_MARKER}"
-  puts ''
-  puts ''
-  puts '     |     |'
-  puts "  #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
-  puts '     |     |'
-  puts '-----+-----+-----'
-  puts '     |     |'
-  puts "  #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}"
-  puts '     |     |'
-  puts '-----+-----+-----'
-  puts '     |     |'
-  puts "  #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
-  puts '     |     |'
-  puts ''
+  puts 'Tic Tac Toe!'.center(27)
+  print '    '
+  17.times { print '=' }
+  puts
+  puts "       Player: #{PLAYER_MARKER}"
+  puts "       Computer: #{COMPUTER_MARKER}"
+  print '    '
+  17.times { print '-' }
+  puts '    '
+  puts '    '
+  puts '         |     |'
+  puts "      #{brd[1]}  |  #{brd[2]}  |  #{brd[3]}"
+  puts '         |     |'
+  puts '    -----+-----+-----'
+  puts '         |     |'
+  puts "      #{brd[4]}  |  #{brd[5]}  |  #{brd[6]}"
+  puts '         |     |'
+  puts '    -----+-----+-----'
+  puts '         |     |'
+  puts "      #{brd[7]}  |  #{brd[8]}  |  #{brd[9]}"
+  puts '         |     |'
+  puts '    '
 end
 # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
@@ -59,10 +59,26 @@ def empty_squares(brd)
   # returns an array of keys pointing to INITIAL_MARKER values (empty spaces).
 end
 
+def joiner(empty_squares_array, separator = ', ', end_word = 'or')
+  if empty_squares_array.count > 1
+    str = empty_squares_array.join("#{separator}")
+    str[str.length-3] = " #{end_word}"
+    str
+  else
+    str = empty_squares_array[0]
+  end
+end
+# Bonus Feature 1:
+# joinor([1, 2, 3])                # => "1, 2, or 3"
+# joinor([1, 2, 3], '; ')          # => "1; 2; or 3"
+# joinor([1, 2, 3], ', ', 'and')   # => "1, 2, and 3"
+
 def player_places_piece!(brd)
   square = ''
   loop do
-    prompt("Choose a square [#{empty_squares(brd).join(', ')}]")
+    # prompt("Choose a square: #{joiner(empty_squares(brd))}")
+    # prompt("Choose a square: #{joiner(empty_squares(brd), SEPARATOR)}")
+    prompt("Choose a square: #{joiner(empty_squares(brd), SEPARATOR, END_WORD)}")
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     puts "That is not a valid entry. Try again."
@@ -84,7 +100,8 @@ def someone_won?(brd)
 end
 
 def check_winner(brd, line, marker)
-  brd[line[0]] == marker && brd[line[1]] == marker && brd[line[2]] == marker
+  # brd.values_at(line[0], line[1], line[2]).count(marker) == 3
+  brd.values_at(*line).count(marker) == 3
 end
 
 def detect_winner(brd)
@@ -115,7 +132,7 @@ loop do
     prompt "It's a tie!"
   end
   puts ""
-  prompt "Play again? (Y or any other key to quit)."
+  prompt "Play again? (y or n)."
   continue = gets.chomp.downcase
   break if !continue.start_with?("y")
 end

@@ -1,6 +1,6 @@
-# ttt_bonus_2_score.rb
+# ttt_bonus_3_ai.rb
 
-# Keep score (no constants or globals). First one to reach 5, wins.
+# Make the computer defensive minded, so that if there's an immediate threat, then it will defend the 3rd square. We'll consider an "immediate threat" to be 2 squares marked by the opponent in a row. If there's no immediate threat, then it will just pick a random square.
 
 require 'pry'
 
@@ -71,7 +71,6 @@ def initialize_board
 end
 
 def empty_squares(brd)
-  # binding.pry
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
   # returns an array of keys pointing to INITIAL_MARKER values (empty spaces).
 end
@@ -108,7 +107,22 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def there_is_a_threat?(brd, line, marker)
+  brd.values_at(*line).count(marker) == 2 && brd.values_at(*line).include?(INITIAL_MARKER)
+  # Get first line with 2 player pieces AND where brd is empty at 3rd position in that line.
+end
+
 def computer_places_piece!(brd)
+  WINNING_LINES.each do |line|
+    if there_is_a_threat?(brd, line, PLAYER_MARKER)
+      (0..2).each do |n| # Find blank space to block the treat.
+        if brd[line[n]] == INITIAL_MARKER
+          brd[line[n]] = COMPUTER_MARKER
+          return
+        end
+      end
+    end
+  end
   square = empty_squares(brd).sample
   brd[square] = COMPUTER_MARKER
 end
@@ -137,23 +151,26 @@ def someone_won?(brd)
   !!detect_winner(brd) # !! (bang bang) forces return value (string) to boolean ...
 end
 
-def update_score_and_comment(board, scores, comment)
-  player_or_computer = detect_winner(board)
-  case player_or_computer
-  when "Player"
-    entity = PLAYER
-  when "Computer"
-    entity = COMPUTER
+def update_comment(scores, winner, winning_entity)
+  if scores[winning_entity] == MAX_SCORE
+    comment = "#{winner} wins the Game!"
   else
-    entity = "Error in update_score_and_comment!"
+    comment = "#{winner} won the round!"
   end
-  scores[entity] += 1
-  if scores[entity] == MAX_SCORE
-    comment = "#{player_or_computer} wins the Game!"
-  else
-    comment = "#{player_or_computer} won the round!"
-  end
+  comment
+end
 
+def update_score_and_comment(board, scores, comment)
+  winner = detect_winner(board)
+  if winner == "Player"
+    winning_entity = PLAYER
+  elsif winner == "Computer"
+    winning_entity = COMPUTER
+  else
+    winning_entity = "Error in update_score_and_comment method!"
+  end
+  scores[winning_entity] += 1
+  comment = update_comment(scores, winner, winning_entity)
   return scores, comment
 end
 
@@ -166,6 +183,7 @@ loop do
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
     computer_places_piece!(board)
+    # display_board(board, scores)
     break if someone_won?(board) || board_full?(board)
   end
 

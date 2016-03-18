@@ -15,8 +15,8 @@ END_WORD = 'or'.freeze
 DISPLAY_OFFSET = '          '.freeze
 DISPLAY_UNDERLINE =        '-----------------'.freeze
 DISPLAY_DOUBLE_UNDERLINE = '================='.freeze
-PLAYER = 0.freeze
-COMPUTER = 1.freeze
+PLAYER = 0
+COMPUTER = 1
 MAX_SCORE = 5
 
 def prompt(msg)
@@ -60,7 +60,7 @@ def display_board(brd, scores, comment = '')
   display '     |     |'
   display
   display
-  display "#{comment}"
+  display comment
 end
 # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
@@ -77,13 +77,12 @@ def empty_squares(brd)
 end
 
 def joiner(empty_squares_array, separator = ', ', end_word = 'or')
+  str = empty_squares_array[0]
   if empty_squares_array.count > 1
-    str = empty_squares_array.join("#{separator}")
-    str[str.length-3] = " #{end_word}"
-    str
-  else
-    str = empty_squares_array[0]
+    str = empty_squares_array.join(separator)
+    str[str.length - 3] = " #{end_word}"
   end
+  str
 end
 # Bonus Feature 1:
 # joinor([1, 2, 3])                # => "1, 2, or 3"
@@ -119,7 +118,7 @@ def check_winner(brd, line, marker)
   brd.values_at(*line).count(marker) == 3
 end
 
-def detect_winner(brd, scores)
+def detect_winner(brd)
   WINNING_LINES.each do |line|
     if check_winner(brd, line, PLAYER_MARKER)
       return "Player"
@@ -135,11 +134,11 @@ def board_full?(brd)
 end
 
 def someone_won?(brd, scores)
-  !!detect_winner(brd, scores) # !! (bang bang) forces return value (string) to boolean ...
+  !!detect_winner(brd) # !! (bang bang) forces return value (string) to boolean ...
 end
 
 def update_score_and_comment(board, scores, comment)
-  player_or_computer = detect_winner(board, scores)
+  player_or_computer = detect_winner(board)
   case player_or_computer
   when "Player"
     entity = PLAYER
@@ -148,7 +147,6 @@ def update_score_and_comment(board, scores, comment)
   else
     entity = "Error in update_score_and_comment!"
   end
-  
   scores[entity] += 1
   if scores[entity] == MAX_SCORE
     comment = "#{player_or_computer} wins the Game!"
@@ -174,21 +172,6 @@ loop do
   display_board(board, scores)
   if someone_won?(board, scores)
     scores, comment = update_score_and_comment(board, scores, comment)
-    # if detect_winner(board, scores) == "Player"
-    #   scores[PLAYER] += 1
-    #   if scores[PLAYER] == MAX_SCORE
-    #     comment = "Player wins the Game!"
-    #   else
-    #     comment = "Player won the round!"
-    #   end
-    # elsif detect_winner(board, scores) == "Computer"
-    #   scores[COMPUTER] += 1
-    #   if scores[COMPUTER] == MAX_SCORE
-    #     comment = "Computer wins the Game!"
-    #   else
-    #     comment = "Computer won the round!"
-    #   end
-    # end
   else
     comment = "It's a tie!"
   end

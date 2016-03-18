@@ -19,7 +19,6 @@ PLAYER = 0.freeze
 COMPUTER = 1.freeze
 MAX_SCORE = 5
 
-
 def prompt(msg)
   puts "=> #{msg}"
 end
@@ -139,6 +138,27 @@ def someone_won?(brd, scores)
   !!detect_winner(brd, scores) # !! (bang bang) forces return value (string) to boolean ...
 end
 
+def update_score_and_comment(board, scores, comment)
+  player_or_computer = detect_winner(board, scores)
+  case player_or_computer
+  when "Player"
+    entity = PLAYER
+  when "Computer"
+    entity = COMPUTER
+  else
+    entity = "Error in update_score_and_comment!"
+  end
+  
+  scores[entity] += 1
+  if scores[entity] == MAX_SCORE
+    comment = "#{player_or_computer} wins the Game!"
+  else
+    comment = "#{player_or_computer} won the round!"
+  end
+
+  return scores, comment
+end
+
 scores = [0, 0]
 comment = ''
 loop do
@@ -153,24 +173,26 @@ loop do
 
   display_board(board, scores)
   if someone_won?(board, scores)
-    if detect_winner(board, scores) == "Player"
-      scores[PLAYER] += 1
-      if scores[PLAYER] == MAX_SCORE
-        comment = "Player wins the Game!"
-      else
-        comment = "Player won the round!"
-      end
-    elsif detect_winner(board, scores) == "Computer"
-      scores[COMPUTER] += 1
-      if scores[COMPUTER] == MAX_SCORE
-        comment = "Computer wins the Game!"
-      else
-        comment = "Computer won the round!"
-      end
-    end
+    scores, comment = update_score_and_comment(board, scores, comment)
+    # if detect_winner(board, scores) == "Player"
+    #   scores[PLAYER] += 1
+    #   if scores[PLAYER] == MAX_SCORE
+    #     comment = "Player wins the Game!"
+    #   else
+    #     comment = "Player won the round!"
+    #   end
+    # elsif detect_winner(board, scores) == "Computer"
+    #   scores[COMPUTER] += 1
+    #   if scores[COMPUTER] == MAX_SCORE
+    #     comment = "Computer wins the Game!"
+    #   else
+    #     comment = "Computer won the round!"
+    #   end
+    # end
   else
     comment = "It's a tie!"
   end
+
   display_board(board, scores, comment)
   display
   prompt "Play again? (y or n)."

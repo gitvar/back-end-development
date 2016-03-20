@@ -1,4 +1,4 @@
-# ttt_bonus_2_score.rb
+# ttt_bonus_4_ai_attack.rb
 
 # Keep score (no constants or globals). First one to reach 5, wins.
 
@@ -17,7 +17,7 @@ DISPLAY_UNDERLINE =        '-----------------'.freeze
 DISPLAY_DOUBLE_UNDERLINE = '================='.freeze
 PLAYER = 0
 COMPUTER = 1
-MAX_SCORE = 5
+MAX_SCORE = 3
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -108,8 +108,46 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def find_at_risk_square(line, board)
+  if board.values_at(*line).count(PLAYER_MARKER) == 2
+    board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
+    # binding.pry
+  else
+    nil
+  end
+end
+
+def find_attacking_square(line, board)
+  if board.values_at(*line).count(COMPUTER_MARKER) == 2
+    board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
+    # binding.pry
+  else
+    nil
+  end
+end
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = nil
+  # If computer has 2 places in winning line, make it 3, if 3rd place is open.
+  WINNING_LINES.each do |line|
+    square = find_attacking_square(line, brd)
+    break if square
+  end
+  # binding.pry
+  if !square
+    # If not, check to block player, if player has 2 places in a winning line.
+    WINNING_LINES.each do |line|
+      square = find_at_risk_square(line, brd)
+      break if square
+    end
+    # binding.pry
+  end
+  if ! square
+    # Else, pick a random open space for computer piece
+    # binding.pry
+    square = empty_squares(brd).sample
+  end
+
   brd[square] = COMPUTER_MARKER
 end
 
@@ -178,10 +216,11 @@ loop do
 
   display_board(board, scores, comment)
   display
+  break if scores.include?(MAX_SCORE)
   prompt "Play again? (y or n)."
   continue = gets.chomp.downcase
   break if continue.start_with?("n")
-  scores = [0, 0] if scores.include?(MAX_SCORE)
+  # scores = [0, 0] if scores.include?(MAX_SCORE)
 end
 
 prompt "Goodbye, thanks for playing!"

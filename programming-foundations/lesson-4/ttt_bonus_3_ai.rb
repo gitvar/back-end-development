@@ -108,23 +108,31 @@ def player_places_piece!(brd)
 end
 
 def there_is_a_threat?(brd, line, marker)
-  brd.values_at(*line).count(marker) == 2 && brd.values_at(*line).include?(INITIAL_MARKER)
   # Get first line with 2 player pieces AND where brd is empty at 3rd position in that line.
+  brd.values_at(*line).count(marker) == 2 && brd.values_at(*line).include?(INITIAL_MARKER)
+end
+
+def block_player(brd, line)
+  (0..2).each do |n| # Find blank space to block the treat.
+    if brd[line[n]] == INITIAL_MARKER
+      brd[line[n]] = COMPUTER_MARKER
+    end
+  end
 end
 
 def computer_places_piece!(brd)
+  blocked = false
   WINNING_LINES.each do |line|
     if there_is_a_threat?(brd, line, PLAYER_MARKER)
-      (0..2).each do |n| # Find blank space to block the treat.
-        if brd[line[n]] == INITIAL_MARKER
-          brd[line[n]] = COMPUTER_MARKER
-          return
-        end
-      end
+      block_player(brd, line)
+      blocked = true
+      break
     end
   end
-  square = empty_squares(brd).sample
-  brd[square] = COMPUTER_MARKER
+  if !blocked
+    square = empty_squares(brd).sample
+    brd[square] = COMPUTER_MARKER
+  end
 end
 
 def check_winner(brd, line, marker)
@@ -140,7 +148,7 @@ def detect_winner(brd)
       return "Computer"
     end
   end
-  nil # return nil to force someone_won? to return false. "nil = false"
+  nil # return nil to force someone_won? to return false. "nil = false".
 end
 
 def board_full?(brd)
@@ -148,7 +156,7 @@ def board_full?(brd)
 end
 
 def someone_won?(brd)
-  !!detect_winner(brd) # !! (bang bang) forces return value (string) to boolean ...
+  !!detect_winner(brd) # !! (bang bang) forces return string to boolean.
 end
 
 def update_comment(scores, winner, winning_entity)
@@ -180,10 +188,10 @@ loop do
   board = initialize_board
   loop do
     display_board(board, scores)
+
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
     computer_places_piece!(board)
-    # display_board(board, scores)
     break if someone_won?(board) || board_full?(board)
   end
 
@@ -198,7 +206,7 @@ loop do
   display
   prompt "Play again? (y or n)."
   continue = gets.chomp.downcase
-  break if !continue.start_with?("y")
+  break if continue.start_with?("n")
   scores = [0, 0] if scores.include?(MAX_SCORE)
 end
 

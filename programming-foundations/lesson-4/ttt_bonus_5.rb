@@ -1,6 +1,4 @@
-# ttt_bonus_2_score.rb
-
-# Keep score (no constants or globals). First one to reach 5, wins.
+# ttt_bonus_5.rb
 
 require 'pry'
 
@@ -17,7 +15,8 @@ DISPLAY_UNDERLINE =        '-----------------'.freeze
 DISPLAY_DOUBLE_UNDERLINE = '================='.freeze
 PLAYER = 0
 COMPUTER = 1
-MAX_SCORE = 5
+MAX_SCORE = 1 # Should be 5
+WHO_GOES_FIRST = 4  # 1 = Player, 2 = Computer, 3 = Ask user, 4 = Random (1 - 3)
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -25,6 +24,21 @@ end
 
 def display(display_string = '')
   puts DISPLAY_OFFSET + display_string
+end
+
+def display_intro_screen
+    system 'clear' # For Mac Terminal
+    display
+    display
+    display 'Tic Tac Toe!'.center(18)
+    display
+    display(DISPLAY_DOUBLE_UNDERLINE)
+    display
+    display "Player: #{PLAYER_MARKER}"
+    display "Computer: #{COMPUTER_MARKER}"
+    display
+    display(DISPLAY_UNDERLINE)
+    display
 end
 
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
@@ -108,8 +122,40 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
+def find_at_risk_square(line, board, marker)
+  if board.values_at(*line).count(marker) == 2
+    board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
+    # binding.pry
+  else
+    nil
+  end
+end
+
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = nil
+  # If computer has 2 places in winning line, make it 3, if 3rd place is open.
+  marker = COMPUTER_MARKER
+  WINNING_LINES.each do |line|
+    square = find_at_risk_square(line, brd, marker)
+    break if square
+  end
+  if !square
+    # If not, check to block player, if player has 2 places in a winning line.
+    marker = PLAYER_MARKER
+    WINNING_LINES.each do |line|
+      square = find_at_risk_square(line, brd, marker)
+      break if square
+    end
+  end
+  if !square
+    # Else, check if position 5 is empty
+    if brd[5] == INITIAL_MARKER
+      square = 5
+    else # pick a random open space for the computer piece
+      square = empty_squares(brd).sample
+    end
+  end
+
   brd[square] = COMPUTER_MARKER
 end
 
@@ -157,16 +203,67 @@ def update_score_and_comment(board, scores, comment)
   return scores, comment
 end
 
+def who_goes_first
+  display_intro_screen
+  case WHO_GOES_FIRST
+  when 1
+    go_first = 1 # Player
+  when 2
+    go_first = 2 # Computer
+  when 3
+    go_first = 3 # "Ask"
+  when 4
+    go_first = 1 + rand(3)
+    # binding.pry
+  else
+    prompt "Who goes first method error!"
+  end
+
+  go_first
+end
+
+def ask_player
+  go_first = 1
+  loop do
+    # display_intro_screen
+    prompt "First move to 1. Player. or 2. Computer ?"
+    go_first = gets.chomp.to_i
+    if ![1, 2].include?(go_first)
+       prompt "That is not a valid input. Try Again."
+       prompt " "
+    else
+      break
+    end
+  end
+  go_first
+end
+
 scores = [0, 0]
 comment = ''
+go_first = who_goes_first
+# binding.pry
+
 loop do
   board = initialize_board
   loop do
-    display_board(board, scores)
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+    if go_first == 3 # "Ask"
+      go_first = ask_player
+    end
+    # binding.pry
+    if go_first == 1 # "Player"
+      display_board(board, scores)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    elsif go_first == 2 # "Computer"
+      computer_places_piece!(board)
+      display_board(board, scores)
+      # binding.pry
+      break if someone_won?(board) || board_full?(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
   end
 
   display_board(board, scores)
@@ -178,10 +275,15 @@ loop do
 
   display_board(board, scores, comment)
   display
+  # break if scores.include?(MAX_SCORE) # Use this line if you want to stop the game after someone won MAX_SCORE round.
   prompt "Play again? (y or n)."
   continue = gets.chomp.downcase
   break if continue.start_with?("n")
-  scores = [0, 0] if scores.include?(MAX_SCORE)
+
+  if scores.include?(MAX_SCORE)
+    scores = [0, 0]
+    go_first = who_goes_first
+  end
 end
 
 prompt "Goodbye, thanks for playing!"

@@ -17,7 +17,7 @@ DISPLAY_UNDERLINE =        '-----------------'.freeze
 DISPLAY_DOUBLE_UNDERLINE = '================='.freeze
 PLAYER = 0
 COMPUTER = 1
-MAX_SCORE = 3
+MAX_SCORE = 5 # Should be 5
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -76,7 +76,7 @@ def empty_squares(brd)
   # returns an array of keys pointing to INITIAL_MARKER values (empty spaces).
 end
 
-def joiner(empty_squares_array, separator = ', ', end_word = 'or')
+def joinor(empty_squares_array, separator = ', ', end_word = 'or')
   str = empty_squares_array[0]
   if empty_squares_array.count > 1
     str = empty_squares_array.join(separator)
@@ -98,9 +98,9 @@ end
 def player_places_piece!(brd)
   square = ''
   loop do
-    # prompt("Choose a square: #{joiner(empty_squares(brd))}")
-    # prompt("Choose a square: #{joiner(empty_squares(brd), SEPARATOR)}")
-    prompt("Choose a square: #{joiner(empty_squares(brd), SEPARATOR, END_WORD)}")
+    # prompt("Choose a square: #{joinor(empty_squares(brd))}")
+    # prompt("Choose a square: #{joinor(empty_squares(brd), SEPARATOR)}")
+    prompt("Choose a square: #{joinor(empty_squares(brd), SEPARATOR, END_WORD)}")
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     puts "That is not a valid entry. Try again."
@@ -133,18 +133,15 @@ def computer_places_piece!(brd)
     square = find_attacking_square(line, brd)
     break if square
   end
-  # binding.pry
   if !square
     # If not, check to block player, if player has 2 places in a winning line.
     WINNING_LINES.each do |line|
       square = find_at_risk_square(line, brd)
       break if square
     end
-    # binding.pry
   end
   if ! square
     # Else, pick a random open space for computer piece
-    # binding.pry
     square = empty_squares(brd).sample
   end
 
@@ -175,24 +172,13 @@ def someone_won?(brd)
   !!detect_winner(brd) # !! (bang bang) forces return string to boolean.
 end
 
-def update_score_and_comment(board, scores, comment)
-  player_or_computer = detect_winner(board)
-  case player_or_computer
-  when "Player"
-    entity = PLAYER
-  when "Computer"
-    entity = COMPUTER
-  else
-    entity = "Error in update_score_and_comment!"
-  end
-  scores[entity] += 1
-  if scores[entity] == MAX_SCORE
-    comment = "#{player_or_computer} wins the Game!"
-  else
-    comment = "#{player_or_computer} won the round!"
-  end
+def update_scores(winner, scores)
+  winner == "Player"? scores[PLAYER] += 1 : scores[COMPUTER] += 1
+  scores
+end
 
-  return scores, comment
+def update_comment(winner, scores)
+  scores.include?(MAX_SCORE)? "#{winner} wins the Game!" : "#{winner} won the round!"
 end
 
 scores = [0, 0]
@@ -209,18 +195,19 @@ loop do
 
   display_board(board, scores)
   if someone_won?(board)
-    scores, comment = update_score_and_comment(board, scores, comment)
+    winner = detect_winner(board)
+    scores = update_scores(winner, scores)
+    comment = update_comment(winner, scores)
   else
     comment = "It's a tie!"
   end
 
   display_board(board, scores, comment)
   display
-  break if scores.include?(MAX_SCORE)
   prompt "Play again? (y or n)."
   continue = gets.chomp.downcase
   break if continue.start_with?("n")
-  # scores = [0, 0] if scores.include?(MAX_SCORE)
+  scores = [0, 0] if scores.include?(MAX_SCORE)
 end
 
 prompt "Goodbye, thanks for playing!"

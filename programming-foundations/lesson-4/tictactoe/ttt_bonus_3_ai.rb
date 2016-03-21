@@ -75,31 +75,21 @@ def empty_squares(brd)
   # returns an array of keys pointing to INITIAL_MARKER values (empty spaces).
 end
 
-def joiner(empty_squares_array, separator = ', ', end_word = 'or')
-  str = empty_squares_array[0]
-  if empty_squares_array.count > 1
-    str = empty_squares_array.join(separator)
-    str[str.length - 3] = " #{end_word}"
-  end
-  str
+def joinor(empty_squares_array, separator = ', ', end_word = 'or')
+  empty_squares_array[-1] = "#{end_word} #{empty_squares_array.last}" if empty_squares_array.size > 1
+  empty_squares_array.join(separator)
 end
 # Bonus Feature 1:
 # joinor([1, 2, 3])                # => "1, 2, or 3"
 # joinor([1, 2, 3], '; ')          # => "1; 2; or 3"
 # joinor([1, 2, 3], ', ', 'and')   # => "1, 2, and 3"
 
-# Launch Schoo; Solution: So much more logical and elegant!!!
-# def joinor(arr, delimiter=', ', word='or')
-#   arr[-1] = "#{word} #{arr.last}" if arr.size > 1
-#   arr.join(delimiter)
-# end
-
 def player_places_piece!(brd)
   square = ''
   loop do
-    # prompt("Choose a square: #{joiner(empty_squares(brd))}")
-    # prompt("Choose a square: #{joiner(empty_squares(brd), SEPARATOR)}")
-    prompt("Choose a square: #{joiner(empty_squares(brd), SEPARATOR, END_WORD)}")
+    # prompt("Choose a square: #{joinor(empty_squares(brd))}")
+    # prompt("Choose a square: #{joinor(empty_squares(brd), SEPARATOR)}")
+    prompt("Choose a square: #{joinor(empty_squares(brd), SEPARATOR, END_WORD)}")
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     puts "That is not a valid entry. Try again."
@@ -159,27 +149,13 @@ def someone_won?(brd)
   !!detect_winner(brd) # !! (bang bang) forces return string to boolean.
 end
 
-def update_comment(scores, winner, winning_entity)
-  if scores[winning_entity] == MAX_SCORE
-    comment = "#{winner} wins the Game!"
-  else
-    comment = "#{winner} won the round!"
-  end
-  comment
+def update_scores(winner, scores)
+  winner == "Player"? scores[PLAYER] += 1 : scores[COMPUTER] += 1
+  scores
 end
 
-def update_score_and_comment(board, scores, comment)
-  winner = detect_winner(board)
-  if winner == "Player"
-    winning_entity = PLAYER
-  elsif winner == "Computer"
-    winning_entity = COMPUTER
-  else
-    winning_entity = "Error in update_score_and_comment method!"
-  end
-  scores[winning_entity] += 1
-  comment = update_comment(scores, winner, winning_entity)
-  return scores, comment
+def update_comment(winner, scores)
+  scores.include?(MAX_SCORE)? "#{winner} wins the Game!" : "#{winner} won the round!"
 end
 
 scores = [0, 0]
@@ -197,7 +173,9 @@ loop do
 
   display_board(board, scores)
   if someone_won?(board)
-    scores, comment = update_score_and_comment(board, scores, comment)
+    winner = detect_winner(board)
+    scores = update_scores(winner, scores)
+    comment = update_comment(winner, scores)
   else
     comment = "It's a tie!"
   end

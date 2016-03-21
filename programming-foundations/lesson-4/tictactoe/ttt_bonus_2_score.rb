@@ -137,28 +137,16 @@ def someone_won?(brd)
   !!detect_winner(brd) # !! (bang bang) forces return string to boolean.
 end
 
-def update_score_and_comment(board, scores, comment)
-  player_or_computer = detect_winner(board)
-  case player_or_computer
-  when "Player"
-    entity = PLAYER
-  when "Computer"
-    entity = COMPUTER
-  else
-    entity = "Error in update_score_and_comment!"
-  end
-  scores[entity] += 1
-  if scores[entity] == MAX_SCORE
-    comment = "#{player_or_computer} wins the Game!"
-  else
-    comment = "#{player_or_computer} won the round!"
-  end
+def update_scores(winner, scores)
+  winner == "Player"? scores[PLAYER] += 1 : scores[COMPUTER] += 1
+  scores
+end
 
-  return scores, comment
+def update_comment(winner, scores)
+  scores.include?(MAX_SCORE)? "#{winner} wins the Game!" : "#{winner} won the round!"
 end
 
 scores = [0, 0]
-comment = ''
 loop do
   board = initialize_board
   loop do
@@ -171,7 +159,9 @@ loop do
 
   display_board(board, scores)
   if someone_won?(board)
-    scores, comment = update_score_and_comment(board, scores, comment)
+    winner = detect_winner(board)
+    scores = update_scores(winner, scores)
+    comment = update_comment(winner, scores)
   else
     comment = "It's a tie!"
   end

@@ -75,6 +75,7 @@ def empty_squares(brd)
   # returns an array of keys pointing to INITIAL_MARKER values (empty spaces).
 end
 
+# Joinor implemented Launch School way:
 def joinor(empty_squares_array, separator = ', ', end_word = 'or')
   empty_squares_array[-1] = "#{end_word} #{empty_squares_array.last}" if empty_squares_array.size > 1
   empty_squares_array.join(separator)
@@ -97,29 +98,25 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def there_is_a_threat?(brd, line, marker)
-  # Get first line with 2 player pieces AND where brd is empty at 3rd position in that line.
-  brd.values_at(*line).count(marker) == 2 && brd.values_at(*line).include?(INITIAL_MARKER)
-end
-
+# Bonus 3: Block player.
 def block_player(brd, line)
-  (0..2).each do |n| # Find blank space to block the treat.
+  (0..2).each do |n| # Find blank space to block the threat.
     if brd[line[n]] == INITIAL_MARKER
       brd[line[n]] = COMPUTER_MARKER
     end
   end
 end
 
+def detect_a_threat?(brd, line, marker)
+  # Get line with 2 player pieces AND where line is empty at 3rd posistion.
+  brd.values_at(*line).count(marker) == 2 && brd.values_at(*line).include?(INITIAL_MARKER)
+end
+
 def computer_places_piece!(brd)
-  blocked = false
-  WINNING_LINES.each do |line|
-    if there_is_a_threat?(brd, line, PLAYER_MARKER)
-      block_player(brd, line)
-      blocked = true
-      break
-    end
-  end
-  if !blocked
+  line_to_block = WINNING_LINES.find { |line| detect_a_threat?(brd, line, PLAYER_MARKER) }
+  if line_to_block
+    block_player(brd, line_to_block)
+  else
     square = empty_squares(brd).sample
     brd[square] = COMPUTER_MARKER
   end
@@ -150,12 +147,12 @@ def someone_won?(brd)
 end
 
 def update_scores(winner, scores)
-  winner == "Player"? scores[PLAYER] += 1 : scores[COMPUTER] += 1
+  winner == "Player" ? scores[PLAYER] += 1 : scores[COMPUTER] += 1
   scores
 end
 
 def update_comment(winner, scores)
-  scores.include?(MAX_SCORE)? "#{winner} wins the Game!" : "#{winner} won the round!"
+  scores.include?(MAX_SCORE) ? "#{winner} wins the Game!" : "#{winner} won the round!"
 end
 
 scores = [0, 0]

@@ -59,21 +59,16 @@ def empty_squares(brd)
   # returns an array of keys pointing to INITIAL_MARKER values (empty spaces).
 end
 
-def joiner(empty_squares_array, separator = ', ', end_word = 'or')
+# Bonus 1: My Joinor Method:
+def joinor(empty_squares_array, separator = ', ', end_word = 'or')
+  str = empty_squares_array[0]
   if empty_squares_array.count > 1
-    str = empty_squares_array.join("#{separator}")
-    str[str.length-3] = " #{end_word}"
-    str
-  else
-    str = empty_squares_array[0]
+    str = empty_squares_array.join(separator.to_s)
+    str[str.length - 3] = " #{end_word}"
   end
+  str
 end
-# Bonus Feature 1:
-# joinor([1, 2, 3])                # => "1, 2, or 3"
-# joinor([1, 2, 3], '; ')          # => "1; 2; or 3"
-# joinor([1, 2, 3], ', ', 'and')   # => "1, 2, and 3"
-
-# Launch Schoo; Solution: So much more logical and elegant!!!
+# Launch School Solution: So much more logical and elegant!!!
 # def joinor(arr, delimiter=', ', word='or')
 #   arr[-1] = "#{word} #{arr.last}" if arr.size > 1
 #   arr.join(delimiter)
@@ -82,9 +77,9 @@ end
 def player_places_piece!(brd)
   square = ''
   loop do
-    # prompt("Choose a square: #{joiner(empty_squares(brd))}")
-    # prompt("Choose a square: #{joiner(empty_squares(brd), SEPARATOR)}")
-    prompt("Choose a square: #{joiner(empty_squares(brd), SEPARATOR, END_WORD)}")
+    # prompt("Choose a square: #{joinor(empty_squares(brd))}")
+    # prompt("Choose a square: #{joinor(empty_squares(brd), SEPARATOR)}")
+    prompt("Choose a square: #{joinor(empty_squares(brd), SEPARATOR, END_WORD)}")
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
     puts "That is not a valid entry. Try again."

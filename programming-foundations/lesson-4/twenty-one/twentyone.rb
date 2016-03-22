@@ -91,11 +91,11 @@ player_hand = []
 
 loop do
   input = nil
+  player_total = 0
   delt_card = shuffled_deck.pop
   player_hand << delt_card
   puts "player hand = #{player_hand}"
-  player_total = 0
-
+ 
   player_hand.each do |card|
     if card.keys.join.include?("Ace")
       player_total += 11

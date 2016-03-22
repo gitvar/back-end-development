@@ -110,19 +110,13 @@ end
 
 def find_at_risk_square(line, board)
   if board.values_at(*line).count(PLAYER_MARKER) == 2
-    board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
-    # binding.pry
-  else
-    nil
+    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
   end
 end
 
 def find_attacking_square(line, board)
   if board.values_at(*line).count(COMPUTER_MARKER) == 2
-    board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
-    # binding.pry
-  else
-    nil
+    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
   end
 end
 
@@ -140,7 +134,7 @@ def computer_places_piece!(brd)
       break if square
     end
   end
-  if ! square
+  if !square
     # Else, pick a random open space for computer piece
     square = empty_squares(brd).sample
   end
@@ -173,12 +167,12 @@ def someone_won?(brd)
 end
 
 def update_scores(winner, scores)
-  winner == "Player"? scores[PLAYER] += 1 : scores[COMPUTER] += 1
+  winner == "Player" ? scores[PLAYER] += 1 : scores[COMPUTER] += 1
   scores
 end
 
 def update_comment(winner, scores)
-  scores.include?(MAX_SCORE)? "#{winner} wins the Game!" : "#{winner} won the round!"
+  scores.include?(MAX_SCORE) ? "#{winner} wins the Game!" : "#{winner} won the round!"
 end
 
 scores = [0, 0]

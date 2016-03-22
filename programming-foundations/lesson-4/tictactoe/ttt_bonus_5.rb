@@ -16,7 +16,7 @@ DISPLAY_DOUBLE_UNDERLINE = '================='.freeze
 PLAYER = 0
 COMPUTER = 1
 MAX_SCORE = 5 # Should be 5
-WHO_GOES_FIRST = 3  # 1 = Player, 2 = Computer, 3 = Ask user, 4 = Random (1 - 3)
+WHO_GOES_FIRST = 3 # 1 = Player, 2 = Comp, 3 = Choose (Ask), 4 = Random (1 - 3)
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -27,18 +27,18 @@ def display(display_string = '')
 end
 
 def display_intro_screen
-    system 'clear' # For Mac Terminal
-    display
-    display
-    display 'Tic Tac Toe!'.center(18)
-    display
-    display(DISPLAY_DOUBLE_UNDERLINE)
-    display
-    display "Player: #{PLAYER_MARKER}"
-    display "Computer: #{COMPUTER_MARKER}"
-    display
-    display(DISPLAY_UNDERLINE)
-    display
+  system 'clear' # For Mac Terminal
+  display
+  display
+  display 'Tic Tac Toe!'.center(18)
+  display
+  display(DISPLAY_DOUBLE_UNDERLINE)
+  display
+  display "Player: #{PLAYER_MARKER}"
+  display "Computer: #{COMPUTER_MARKER}"
+  display
+  display(DISPLAY_UNDERLINE)
+  display
 end
 
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
@@ -114,10 +114,7 @@ end
 
 def find_at_risk_square(line, board, marker)
   if board.values_at(*line).count(marker) == 2
-    board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
-    # binding.pry
-  else
-    nil
+    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
   end
 end
 
@@ -173,12 +170,12 @@ def someone_won?(brd)
 end
 
 def update_scores(winner, scores)
-  winner == "Player"? scores[PLAYER] += 1 : scores[COMPUTER] += 1
+  winner == "Player" ? scores[PLAYER] += 1 : scores[COMPUTER] += 1
   scores
 end
 
 def update_comment(winner, scores)
-  scores.include?(MAX_SCORE)? "#{winner} wins the Game!" : "#{winner} won the round!"
+  scores.include?(MAX_SCORE) ? "#{winner} wins the Game!" : "#{winner} won the round!"
 end
 
 def who_goes_first
@@ -186,7 +183,7 @@ def who_goes_first
   if WHO_GOES_FIRST == 4
     1 + rand(3)
   else
-   WHO_GOES_FIRST
+    WHO_GOES_FIRST
   end
 end
 
@@ -197,8 +194,8 @@ def ask_player
     prompt "First move to 1. Player. or 2. Computer ?"
     go_first = gets.chomp.to_i
     if ![1, 2].include?(go_first)
-       prompt "That is not a valid input. Try Again."
-       prompt " "
+      prompt "That is not a valid input. Try Again."
+      prompt " "
     else
       break
     end
@@ -213,7 +210,7 @@ go_first = who_goes_first
 loop do
   board = initialize_board
   loop do
-    if go_first == 3 # "Ask"
+    if go_first == 3 # "Choose"
       go_first = ask_player
     elsif go_first == 1 # "Player"
       display_board(board, scores)

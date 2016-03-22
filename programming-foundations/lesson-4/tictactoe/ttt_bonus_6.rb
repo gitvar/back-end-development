@@ -16,8 +16,8 @@ DISPLAY_DOUBLE_UNDERLINE = '================='.freeze
 PLAYER = 0
 COMPUTER = 1
 MAX_SCORE = 5 # Should be 5
-WHO_GOES_FIRST_CHOICES = ["Player", "Computer", "Ask", "Random"].freeze
-WHO_GOES_FIRST = "Ask".freeze
+WHO_GOES_FIRST_CHOICES = ["Player", "Computer", "Choose", "Random"].freeze
+WHO_GOES_FIRST = "Choose".freeze
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -203,7 +203,7 @@ end
 def who_goes_first
   if WHO_GOES_FIRST == "Random"
     WHO_GOES_FIRST_CHOICES.take(3).sample # Not last "Random"!
-  elsif WHO_GOES_FIRST == "Ask"
+  elsif WHO_GOES_FIRST == "Choose"
     determine_who_plays_first
   else
     WHO_GOES_FIRST # Computer or Player

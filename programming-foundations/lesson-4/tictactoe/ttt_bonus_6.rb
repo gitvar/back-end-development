@@ -44,16 +44,7 @@ end
 
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
 def display_board(brd, scores, comment = '')
-  system 'clear' # For Mac Terminal
-  display
-  display
-  display 'Tic Tac Toe!'.center(18)
-  display
-  display(DISPLAY_DOUBLE_UNDERLINE)
-  display
-  display "Player: #{PLAYER_MARKER}"
-  display "Computer: #{COMPUTER_MARKER}"
-  display
+  display_intro_screen
   display(DISPLAY_UNDERLINE)
   display
   display "Player Score: #{scores[PLAYER]}"
@@ -154,14 +145,11 @@ def check_winner(brd, line, marker)
 end
 
 def detect_winner(brd)
-  WINNING_LINES.each do |line|
-    if check_winner(brd, line, PLAYER_MARKER)
-      return "Player"
-    elsif check_winner(brd, line, COMPUTER_MARKER)
-      return "Computer"
-    end
+  if WINNING_LINES.find { |line| check_winner(brd, line, PLAYER_MARKER) }
+    "Player"
+  elsif WINNING_LINES.find { |line| check_winner(brd, line, COMPUTER_MARKER) }
+    "Computer"
   end
-  nil # return nil to force someone_won? to return false. "nil = false"
 end
 
 def board_full?(brd)

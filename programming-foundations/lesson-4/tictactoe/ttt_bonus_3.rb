@@ -1,6 +1,6 @@
-# ttt_bonus_4_ai_attack.rb
+# ttt_bonus_3_ai.rb
 
-# Keep score (no constants or globals). First one to reach 5, wins.
+# Make the computer defensive minded, so that if there's an immediate threat, then it will defend the 3rd square. We'll consider an "immediate threat" to be 2 squares marked by the opponent in a row. If there's no immediate threat, then it will just pick a random square.
 
 require 'pry'
 
@@ -17,7 +17,7 @@ DISPLAY_UNDERLINE =        '-----------------'.freeze
 DISPLAY_DOUBLE_UNDERLINE = '================='.freeze
 PLAYER = 0
 COMPUTER = 1
-MAX_SCORE = 5 # Should be 5
+MAX_SCORE = 5
 
 def prompt(msg)
   puts "=> #{msg}"
@@ -71,29 +71,19 @@ def initialize_board
 end
 
 def empty_squares(brd)
-  # binding.pry
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
   # returns an array of keys pointing to INITIAL_MARKER values (empty spaces).
 end
 
+# Joinor implemented Launch School way:
 def joinor(empty_squares_array, separator = ', ', end_word = 'or')
-  str = empty_squares_array[0]
-  if empty_squares_array.count > 1
-    str = empty_squares_array.join(separator)
-    str[str.length - 3] = " #{end_word}"
-  end
-  str
+  empty_squares_array[-1] = "#{end_word} #{empty_squares_array.last}" if empty_squares_array.size > 1
+  empty_squares_array.join(separator)
 end
 # Bonus Feature 1:
 # joinor([1, 2, 3])                # => "1, 2, or 3"
 # joinor([1, 2, 3], '; ')          # => "1; 2; or 3"
 # joinor([1, 2, 3], ', ', 'and')   # => "1, 2, and 3"
-
-# Launch Schoo; Solution: So much more logical and elegant!!!
-# def joinor(arr, delimiter=', ', word='or')
-#   arr[-1] = "#{word} #{arr.last}" if arr.size > 1
-#   arr.join(delimiter)
-# end
 
 def player_places_piece!(brd)
   square = ''
@@ -108,38 +98,28 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def find_at_risk_square(line, board)
-  if board.values_at(*line).count(PLAYER_MARKER) == 2
-    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
+# Bonus 3: Block player.
+def block_player(brd, line)
+  (0..2).each do |n| # Find blank space to block the threat.
+    if brd[line[n]] == INITIAL_MARKER
+      brd[line[n]] = COMPUTER_MARKER
+    end
   end
 end
 
-def find_attacking_square(line, board)
-  if board.values_at(*line).count(COMPUTER_MARKER) == 2
-    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
-  end
+def detect_a_threat?(brd, line, marker)
+  # Get line with 2 player pieces AND where line is empty at 3rd posistion.
+  brd.values_at(*line).count(marker) == 2 && brd.values_at(*line).include?(INITIAL_MARKER)
 end
 
 def computer_places_piece!(brd)
-  square = nil
-  # If computer has 2 places in winning line, make it 3, if 3rd place is open.
-  WINNING_LINES.each do |line|
-    square = find_attacking_square(line, brd)
-    break if square
-  end
-  if !square
-    # If not, check to block player, if player has 2 places in a winning line.
-    WINNING_LINES.each do |line|
-      square = find_at_risk_square(line, brd)
-      break if square
-    end
-  end
-  if !square
-    # Else, pick a random open space for computer piece
+  line_to_block = WINNING_LINES.find { |line| detect_a_threat?(brd, line, PLAYER_MARKER) }
+  if line_to_block
+    block_player(brd, line_to_block)
+  else
     square = empty_squares(brd).sample
+    brd[square] = COMPUTER_MARKER
   end
-
-  brd[square] = COMPUTER_MARKER
 end
 
 def check_winner(brd, line, marker)
@@ -148,14 +128,11 @@ def check_winner(brd, line, marker)
 end
 
 def detect_winner(brd)
-  WINNING_LINES.each do |line|
-    if check_winner(brd, line, PLAYER_MARKER)
-      return "Player"
-    elsif check_winner(brd, line, COMPUTER_MARKER)
-      return "Computer"
-    end
+  if WINNING_LINES.find { |line| check_winner(brd, line, PLAYER_MARKER) }
+    "Player"
+  elsif WINNING_LINES.find { |line| check_winner(brd, line, COMPUTER_MARKER) }
+    "Computer"
   end
-  nil # return nil to force someone_won? to return false. "nil = false"
 end
 
 def board_full?(brd)
@@ -181,6 +158,7 @@ loop do
   board = initialize_board
   loop do
     display_board(board, scores)
+
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
     computer_places_piece!(board)

@@ -1,6 +1,6 @@
-# ttt_bonus_3_ai.rb
+# ttt_bonus_2_score.rb
 
-# Make the computer defensive minded, so that if there's an immediate threat, then it will defend the 3rd square. We'll consider an "immediate threat" to be 2 squares marked by the opponent in a row. If there's no immediate threat, then it will just pick a random square.
+# Keep score (no constants or globals). First one to reach 5, wins.
 
 require 'pry'
 
@@ -71,25 +71,31 @@ def initialize_board
 end
 
 def empty_squares(brd)
+  # binding.pry
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
   # returns an array of keys pointing to INITIAL_MARKER values (empty spaces).
 end
 
-# Joinor implemented Launch School way:
+# Bonus 1: My Joinor Method:
 def joinor(empty_squares_array, separator = ', ', end_word = 'or')
-  empty_squares_array[-1] = "#{end_word} #{empty_squares_array.last}" if empty_squares_array.size > 1
-  empty_squares_array.join(separator)
+  str = empty_squares_array[0]
+  if empty_squares_array.count > 1
+    str = empty_squares_array.join(separator.to_s)
+    str[str.length - 3] = " #{end_word}"
+  end
+  str
 end
-# Bonus Feature 1:
-# joinor([1, 2, 3])                # => "1, 2, or 3"
-# joinor([1, 2, 3], '; ')          # => "1; 2; or 3"
-# joinor([1, 2, 3], ', ', 'and')   # => "1, 2, and 3"
+# Launch Schoo; Solution: So much more logical and elegant!!!
+# def joinor(arr, delimiter=', ', word='or')
+#   arr[-1] = "#{word} #{arr.last}" if arr.size > 1
+#   arr.join(delimiter)
+# end
 
 def player_places_piece!(brd)
   square = ''
   loop do
-    # prompt("Choose a square: #{joinor(empty_squares(brd))}")
-    # prompt("Choose a square: #{joinor(empty_squares(brd), SEPARATOR)}")
+    # prompt("Choose a square: #{joiner(empty_squares(brd))}")
+    # prompt("Choose a square: #{joiner(empty_squares(brd), SEPARATOR)}")
     prompt("Choose a square: #{joinor(empty_squares(brd), SEPARATOR, END_WORD)}")
     square = gets.chomp.to_i
     break if empty_squares(brd).include?(square)
@@ -98,28 +104,9 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-# Bonus 3: Block player.
-def block_player(brd, line)
-  (0..2).each do |n| # Find blank space to block the threat.
-    if brd[line[n]] == INITIAL_MARKER
-      brd[line[n]] = COMPUTER_MARKER
-    end
-  end
-end
-
-def detect_a_threat?(brd, line, marker)
-  # Get line with 2 player pieces AND where line is empty at 3rd posistion.
-  brd.values_at(*line).count(marker) == 2 && brd.values_at(*line).include?(INITIAL_MARKER)
-end
-
 def computer_places_piece!(brd)
-  line_to_block = WINNING_LINES.find { |line| detect_a_threat?(brd, line, PLAYER_MARKER) }
-  if line_to_block
-    block_player(brd, line_to_block)
-  else
-    square = empty_squares(brd).sample
-    brd[square] = COMPUTER_MARKER
-  end
+  square = empty_squares(brd).sample
+  brd[square] = COMPUTER_MARKER
 end
 
 def check_winner(brd, line, marker)
@@ -128,14 +115,11 @@ def check_winner(brd, line, marker)
 end
 
 def detect_winner(brd)
-  WINNING_LINES.each do |line|
-    if check_winner(brd, line, PLAYER_MARKER)
-      return "Player"
-    elsif check_winner(brd, line, COMPUTER_MARKER)
-      return "Computer"
-    end
+  if WINNING_LINES.find { |line| check_winner(brd, line, PLAYER_MARKER) }
+    "Player"
+  elsif WINNING_LINES.find { |line| check_winner(brd, line, COMPUTER_MARKER) }
+    "Computer"
   end
-  nil # return nil to force someone_won? to return false. "nil = false".
 end
 
 def board_full?(brd)
@@ -146,6 +130,7 @@ def someone_won?(brd)
   !!detect_winner(brd) # !! (bang bang) forces return string to boolean.
 end
 
+# Bonus 2: Added scoring.
 def update_scores(winner, scores)
   winner == "Player" ? scores[PLAYER] += 1 : scores[COMPUTER] += 1
   scores
@@ -156,12 +141,10 @@ def update_comment(winner, scores)
 end
 
 scores = [0, 0]
-comment = ''
 loop do
   board = initialize_board
   loop do
     display_board(board, scores)
-
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
     computer_places_piece!(board)

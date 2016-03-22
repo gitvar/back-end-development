@@ -85,4 +85,30 @@ new_deck = [ { "Ace of Hearts" => 1 },
 shuffled_deck = new_deck.shuffle
 100.times { shuffled_deck = shuffled_deck.shuffle! }
 
-shuffled_deck.each { |card| puts " #{card.keys.join}'s value is #{card.values.join.to_i}" }
+player_hand = []
+
+# shuffled_deck.each { |card| puts " #{card.keys.join}'s value is #{card.values.join.to_i}" }
+
+loop do
+  input = nil
+  delt_card = shuffled_deck.pop
+  player_hand << delt_card
+  puts "player hand = #{player_hand}"
+  player_total = 0
+
+  player_hand.each do |card|
+    if card.keys.join.include?("Ace")
+      player_total += 11
+    else
+      player_total += card.values.join.to_i
+    end
+  end
+
+  puts "Player total = #{player_total}"
+  puts
+  while !input do
+    puts "Spacebar to hit, any other key to stay."
+    input = gets.chomp
+  end
+  break if input[0] != " "
+end

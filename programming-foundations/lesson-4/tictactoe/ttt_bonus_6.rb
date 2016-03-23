@@ -1,7 +1,5 @@
 # ttt_bonus_6.rb
 
-require 'pry'
-
 INITIAL_MARKER = ' '.freeze
 PLAYER_MARKER = 'X'.freeze
 COMPUTER_MARKER = 'O'.freeze
@@ -15,7 +13,7 @@ DISPLAY_UNDERLINE =        '-----------------'.freeze
 DISPLAY_DOUBLE_UNDERLINE = '================='.freeze
 PLAYER = 0
 COMPUTER = 1
-MAX_SCORE = 5 # Should be 5
+MAX_SCORE = 5
 WHO_GOES_FIRST_CHOICES = ["Player", "Computer", "Choose", "Random"].freeze
 WHO_GOES_FIRST = "Choose".freeze
 
@@ -107,8 +105,6 @@ end
 def find_at_risk_square(line, board, marker)
   if board.values_at(*line).count(marker) == 2
     board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
-    # else
-    # nil
   end
 end
 

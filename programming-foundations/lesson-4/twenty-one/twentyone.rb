@@ -98,7 +98,7 @@ loop do
   input = nil
   player_total = 0
   player_hand << shuffled_deck.pop
-  puts "Player hand = #{player_hand}"
+  puts "Player hand = #{player_hand}" 
 
   player_hand.each do |card|
     card.each_key do |card_type|

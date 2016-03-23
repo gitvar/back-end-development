@@ -29,12 +29,9 @@
 # My ideas about the cards data structure:
 # First idea is to make the deck an array of hashes like so:
 
-my_deck = [ [ "Ace of Hearts", 1 ],
-             [ "2 of Hearts", 2 ],
-             [ "3 of Hearts", 3 ] ]
-my_deck.shuffle
+require 'pry'
 
-new_deck = [ { "Ace of Hearts" => 1 },
+NEW_DECK = [ { "Ace of Hearts" => 11 },
              { "2 of Hearts" => 2 },
              { "3 of Hearts" => 3 },
              { "4 of Hearts" => 4 },
@@ -47,7 +44,7 @@ new_deck = [ { "Ace of Hearts" => 1 },
              { "Jack of Hearts" => 10 },
              { "Queen of Hearts" => 10 },
              { "King of Hearts" => 10 },
-             { "Ace of Spades" => 1 },
+             { "Ace of Spades" => 11 },
              { "2 of Spades" => 2 },
              { "3 of Spades" => 3 },
              { "4 of Spades" => 4 },
@@ -60,7 +57,7 @@ new_deck = [ { "Ace of Hearts" => 1 },
              { "Jack of Spades" => 10 },
              { "Queen of Spades" => 10 },
              { "King of Spades" => 10 },
-             { "Ace of Clubs" => 1 },
+             { "Ace of Clubs" => 11 },
              { "2 of Clubs" => 2 },
              { "3 of Clubs" => 3 },
              { "4 of Clubs" => 4 },
@@ -73,7 +70,7 @@ new_deck = [ { "Ace of Hearts" => 1 },
              { "Jack of Clubs" => 10 },
              { "Queen of Clubs" => 10 },
              { "King of Clubs" => 10 },
-             { "Ace of Diamonds" => 1 },
+             { "Ace of Diamonds" => 11 },
              { "2 of Diamonds" => 2 },
              { "3 of Diamonds" => 3 },
              { "4 of Diamonds" => 4 },
@@ -85,48 +82,65 @@ new_deck = [ { "Ace of Hearts" => 1 },
              { "10 of Diamonds" => 10 },
              { "Jack of Diamonds" => 10 },
              { "Queen of Diamonds" => 10 },
-             { "King of Diamonds" => 10 } ]
-
-shuffled_deck = new_deck.shuffle
-100.times { shuffled_deck = shuffled_deck.shuffle! }
+             { "King of Diamonds" => 10 } ].freeze
 
 player_hand = []
 
-# shuffled_deck.each { |card| puts " #{card.keys.join}'s value is #{card.values.join.to_i}" }
+# The value of the Ace must be adjusted depending on the value of all the cards in the hand. For example: Player gets Ace and 2 and then a 10. The Ace must now be re-evaluated to 1 so that the total is 13 and not 23 (which is bust). However, if the player gets a 7 after the Ace and the 2, the Ace must remain at value 11, to give a total of 20.
+def calculate_ace_value(hand, total)
+  if total <= 10
+    total += 11
+  else
+    total += 1
+  end
+end
+
+def calculate_total(hand)
+  total = 0
+  hand.each do |card|
+    card_type = card.keys.first
+    if card_type.include?("Ace")
+      total = calculate_ace_value(hand, total)
+    else
+      total += card[card_type]
+    end
+  end
+  total
+end
+
+def display_hand(hand, name, total)
+  system 'clear'
+  puts "#{name} Hand:"
+  hand.each { |card| puts "#{card.keys.first}" }
+  puts "#{name} total = #{total}"
+  puts
+end
+
+def shuffle_new_deck
+  NEW_DECK.shuffle
+end
+
+
+game_deck = shuffle_new_deck
 
 loop do
   input = nil
-  player_total = 0
-  player_hand << shuffled_deck.pop
-  puts "Player hand = #{player_hand}" 
+  player_hand << game_deck.pop
+  player_total = calculate_total(player_hand)
+  display_hand(player_hand, "Player", player_total)
 
-  player_hand.each do |card|
-    card.each_key do |card_type|
-      if card_type.include?("Ace") # This should be in a separate method where the value of the Ace can be adjusted depending on the value of the next card. For example: Player gets Ace and 2 and then a 10. The Ace must now be re-evaluated to 1 so that the total is 13 and not 23 (which is bust). However, if the player gets a 7 after the Ace and the 2, the Ace must remain at value 11, to give a total of 20.
-        if player_total <= 10
-          player_total += 11
-        else
-          player_total += 1
-        end
-      else
-        player_total += card[key]
-      end
-    end
-  end
-
-  # player_hand.each do |card|
-  #   if card.keys.join.include?("Ace")
-  #     player_total += 11
-  #   else
-  #     player_total += card.values.join.to_i
-  #   end
-  # end
-
-  puts "Player total = #{player_total}"
-  puts
   while !input do
     puts "Spacebar to hit, any other key to stay."
     input = gets.chomp
   end
   break if input[0] != " "
 end
+
+
+# if card_type.include?("Ace") # This should be in a separate method where
+#   if player_total <= 10
+#     player_total += 11
+#   else
+#     player_total += 1
+#   end
+# else

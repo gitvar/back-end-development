@@ -29,6 +29,11 @@
 # My ideas about the cards data structure:
 # First idea is to make the deck an array of hashes like so:
 
+my_deck = [ [ "Ace of Hearts", 1 ],
+             [ "2 of Hearts", 2 ],
+             [ "3 of Hearts", 3 ] ]
+my_deck.shuffle
+
 new_deck = [ { "Ace of Hearts" => 1 },
              { "2 of Hearts" => 2 },
              { "3 of Hearts" => 3 },
@@ -92,17 +97,30 @@ player_hand = []
 loop do
   input = nil
   player_total = 0
-  delt_card = shuffled_deck.pop
-  player_hand << delt_card
-  puts "player hand = #{player_hand}"
- 
+  player_hand << shuffled_deck.pop
+  puts "Player hand = #{player_hand}"
+
   player_hand.each do |card|
-    if card.keys.join.include?("Ace")
-      player_total += 11
-    else
-      player_total += card.values.join.to_i
+    card.each_key do |card_type|
+      if card_type.include?("Ace") # This should be in a separate method where the value of the Ace can be adjusted depending on the value of the next card. For example: Player gets Ace and 2 and then a 10. The Ace must now be re-evaluated to 1 so that the total is 13 and not 23 (which is bust). However, if the player gets a 7 after the Ace and the 2, the Ace must remain at value 11, to give a total of 20.
+        if player_total <= 10
+          player_total += 11
+        else
+          player_total += 1
+        end
+      else
+        player_total += card[key]
+      end
     end
   end
+
+  # player_hand.each do |card|
+  #   if card.keys.join.include?("Ace")
+  #     player_total += 11
+  #   else
+  #     player_total += card.values.join.to_i
+  #   end
+  # end
 
   puts "Player total = #{player_total}"
   puts

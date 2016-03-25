@@ -85,6 +85,27 @@ NEW_DECK = [ { "Ace of Hearts" => 11 },
              { "King of Diamonds" => 10 } ].freeze
 
 player_hand = []
+dealer_hand = []
+
+def display_table(dealer_hand, player_hand, player_done)
+  system 'clear'
+  puts
+  puts "Twenty-One"
+  puts "=========="
+  puts
+  puts "Dealer Hand:"
+  puts "------------"
+  dealer_total = calculate_dealer_total(dealer_hand, player_done)
+  display_dealer_hand(dealer_hand, dealer_total, player_done)
+  puts
+  puts
+  puts "Player Hand:"
+  puts "------------"
+  player_total = calculate_total(player_hand)
+  display_hand(player_hand, "Player", player_total)
+  puts
+  puts
+end
 
 # The value of the Ace must be adjusted depending on the value of all the cards in the hand. For example: Player gets Ace and 2 and then a 10. The Ace must now be re-evaluated to 1 so that the total is 13 and not 23 (which is bust). However, if the player gets a 7 after the Ace and the 2, the Ace must remain at value 11, to give a total of 20.
 def calculate_ace_value(hand, total)
@@ -109,38 +130,83 @@ def calculate_total(hand)
 end
 
 def display_hand(hand, name, total)
-  system 'clear'
-  puts "#{name} Hand:"
   hand.each { |card| puts "#{card.keys.first}" }
   puts "#{name} total = #{total}"
-  puts
 end
 
 def shuffle_new_deck
   NEW_DECK.shuffle
 end
 
-
-game_deck = shuffle_new_deck
-
-loop do
-  input = nil
-  player_hand << game_deck.pop
-  player_total = calculate_total(player_hand)
-  display_hand(player_hand, "Player", player_total)
-
-  while !input do
-    puts "Spacebar to hit, any other key to stay."
-    input = gets.chomp
+def calculate_dealer_total(dealer_hand, player_done)
+  if player_done
+    dealer_total = calculate_total(dealer_hand)
+  else
+    card_type = dealer_hand[0].keys.first
+    dealer_total = dealer_hand[0][card_type]
   end
-  break if input[0] != " "
 end
 
+def display_dealer_hand(dealer_hand, dealer_total, player_done)
+  if !player_done
+    dealer_hand = [dealer_hand[0]]
+  end
+  display_hand(dealer_hand, "Dealer", dealer_total)
+end
 
-# if card_type.include?("Ace") # This should be in a separate method where
-#   if player_total <= 10
-#     player_total += 11
-#   else
-#     player_total += 1
-#   end
-# else
+def deal_first_cards(game_deck, player_hand, dealer_hand)
+  2.times do
+    player_hand << game_deck.pop
+    dealer_hand << game_deck.pop
+  end
+end
+
+def player_stays?
+  puts "Spacebar to hit, any other key to stay."
+  input = gets.chomp
+  return false if input[0] == " "
+  true
+end
+
+def player_loop(player_hand, dealer_hand, game_deck, player_done)
+  loop do
+    if calculate_total(player_hand) > 21 || player_stays?
+      break
+    else
+      player_hand << game_deck.pop
+      display_table(dealer_hand, player_hand, player_done)
+    end
+  end
+  true
+end
+
+def dealer_loop(player_hand, dealer_hand, game_deck, player_done)
+  display_table(dealer_hand, player_hand, player_done)
+end
+
+def display_winner(player_hand, dealer_hand)
+  if (calculate_total(player_hand) > calculate_total(dealer_hand))
+    puts "Player wins!"
+  elsif (calculate_total(player_hand) == calculate_total(dealer_hand))
+    puts "It's a tie!"
+  else
+    puts "Dealer wins!"
+  end
+end
+
+player_done = false
+game_deck = shuffle_new_deck
+deal_first_cards(game_deck, player_hand, dealer_hand)
+
+loop do
+  display_table(dealer_hand, player_hand, player_done)
+  player_done = player_loop(player_hand, dealer_hand, game_deck, player_done)
+  if player_done && calculate_total(player_hand) <= 21
+    dealer_loop(player_hand, dealer_hand, game_deck, player_done)
+    display_winner(player_hand, dealer_hand)
+    break
+  end
+
+  puts "Player went bust! Dealer wins!"
+  break
+end

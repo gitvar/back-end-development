@@ -26,67 +26,65 @@
 # 6. If dealer bust, player wins.
 # 7. Compare cards and declare winner.
 
-# My ideas about the cards data structure:
-# First idea is to make the deck an array of hashes like so:
-
 require 'pry'
 
-NEW_DECK = [ { "Ace of Hearts" => 11 },
-             { "2 of Hearts" => 2 },
-             { "3 of Hearts" => 3 },
-             { "4 of Hearts" => 4 },
-             { "5 of Hearts" => 5 },
-             { "6 of Hearts" => 6 },
-             { "7 of Hearts" => 7 },
-             { "8 of Hearts" => 8 },
-             { "9 of Hearts" => 9 },
-             { "10 of Hearts" => 10 },
-             { "Jack of Hearts" => 10 },
-             { "Queen of Hearts" => 10 },
-             { "King of Hearts" => 10 },
-             { "Ace of Spades" => 11 },
-             { "2 of Spades" => 2 },
-             { "3 of Spades" => 3 },
-             { "4 of Spades" => 4 },
-             { "5 of Spades" => 5 },
-             { "6 of Spades" => 6 },
-             { "7 of Spades" => 7 },
-             { "8 of Spades" => 8 },
-             { "9 of Spades" => 9 },
-             { "10 of Spades" => 10 },
-             { "Jack of Spades" => 10 },
-             { "Queen of Spades" => 10 },
-             { "King of Spades" => 10 },
-             { "Ace of Clubs" => 11 },
-             { "2 of Clubs" => 2 },
-             { "3 of Clubs" => 3 },
-             { "4 of Clubs" => 4 },
-             { "5 of Clubs" => 5 },
-             { "6 of Clubs" => 6 },
-             { "7 of Clubs" => 7 },
-             { "8 of Clubs" => 8 },
-             { "9 of Clubs" => 9 },
-             { "10 of Clubs" => 10 },
-             { "Jack of Clubs" => 10 },
-             { "Queen of Clubs" => 10 },
-             { "King of Clubs" => 10 },
-             { "Ace of Diamonds" => 11 },
-             { "2 of Diamonds" => 2 },
-             { "3 of Diamonds" => 3 },
-             { "4 of Diamonds" => 4 },
-             { "5 of Diamonds" => 5 },
-             { "6 of Diamonds" => 6 },
-             { "7 of Diamonds" => 7 },
-             { "8 of Diamonds" => 8 },
-             { "9 of Diamonds" => 9 },
-             { "10 of Diamonds" => 10 },
-             { "Jack of Diamonds" => 10 },
-             { "Queen of Diamonds" => 10 },
-             { "King of Diamonds" => 10 } ].freeze
+NEW_DECK = [{ "Ace of Hearts" => 11 },
+            { "2 of Hearts" => 2 },
+            { "3 of Hearts" => 3 },
+            { "4 of Hearts" => 4 },
+            { "5 of Hearts" => 5 },
+            { "6 of Hearts" => 6 },
+            { "7 of Hearts" => 7 },
+            { "8 of Hearts" => 8 },
+            { "9 of Hearts" => 9 },
+            { "10 of Hearts" => 10 },
+            { "Jack of Hearts" => 10 },
+            { "Queen of Hearts" => 10 },
+            { "King of Hearts" => 10 },
+            { "Ace of Spades" => 11 },
+            { "2 of Spades" => 2 },
+            { "3 of Spades" => 3 },
+            { "4 of Spades" => 4 },
+            { "5 of Spades" => 5 },
+            { "6 of Spades" => 6 },
+            { "7 of Spades" => 7 },
+            { "8 of Spades" => 8 },
+            { "9 of Spades" => 9 },
+            { "10 of Spades" => 10 },
+            { "Jack of Spades" => 10 },
+            { "Queen of Spades" => 10 },
+            { "King of Spades" => 10 },
+            { "Ace of Clubs" => 11 },
+            { "2 of Clubs" => 2 },
+            { "3 of Clubs" => 3 },
+            { "4 of Clubs" => 4 },
+            { "5 of Clubs" => 5 },
+            { "6 of Clubs" => 6 },
+            { "7 of Clubs" => 7 },
+            { "8 of Clubs" => 8 },
+            { "9 of Clubs" => 9 },
+            { "10 of Clubs" => 10 },
+            { "Jack of Clubs" => 10 },
+            { "Queen of Clubs" => 10 },
+            { "King of Clubs" => 10 },
+            { "Ace of Diamonds" => 11 },
+            { "2 of Diamonds" => 2 },
+            { "3 of Diamonds" => 3 },
+            { "4 of Diamonds" => 4 },
+            { "5 of Diamonds" => 5 },
+            { "6 of Diamonds" => 6 },
+            { "7 of Diamonds" => 7 },
+            { "8 of Diamonds" => 8 },
+            { "9 of Diamonds" => 9 },
+            { "10 of Diamonds" => 10 },
+            { "Jack of Diamonds" => 10 },
+            { "Queen of Diamonds" => 10 },
+            { "King of Diamonds" => 10 }].freeze
 
 player_hand = []
 dealer_hand = []
 
+# rubocop:disable Metrics/MethodLength, Metrics/AbcSize
 def display_table(dealer_hand, player_hand, player_done)
   system 'clear'
   puts
@@ -106,31 +104,10 @@ def display_table(dealer_hand, player_hand, player_done)
   puts
   puts
 end
-
-# The value of the Ace must be adjusted depending on the value of all the cards in the hand. For example: Player gets Ace and 2 and then a 10. The Ace must now be re-evaluated to 1 so that the total is 13 and not 23 (which is bust). However, if the player gets a 7 after the Ace and the 2, the Ace must remain at value 11, to give a total of 20.
-def calculate_ace_value(hand, total)
-  if total <= 10
-    total += 11
-  else
-    total += 1
-  end
-end
-
-def calculate_total(hand)
-  total = 0
-  hand.each do |card|
-    card_type = card.keys.first
-    if card_type.include?("Ace")
-      total = calculate_ace_value(hand, total)
-    else
-      total += card[card_type]
-    end
-  end
-  total
-end
+# rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
 def display_hand(hand, name, total)
-  hand.each { |card| puts "#{card.keys.first}" }
+  hand.each { |card| puts "#{card.keys.first}.to_s" }
   puts "#{name} total = #{total}"
 end
 
@@ -140,10 +117,10 @@ end
 
 def calculate_dealer_total(dealer_hand, player_done)
   if player_done
-    dealer_total = calculate_total(dealer_hand)
+    calculate_total(dealer_hand)
   else
     card_type = dealer_hand[0].keys.first
-    dealer_total = dealer_hand[0][card_type]
+    dealer_hand[0][card_type]
   end
 end
 
@@ -155,8 +132,12 @@ def display_dealer_hand(dealer_hand, dealer_total, player_done)
 end
 
 def deal_first_cards(game_deck, player_hand, dealer_hand)
+  # For testing
+  player_hand << { "Ace of Hearts" => 11 }
+  player_hand << { "Two of Clubs" => 2 }
+
   2.times do
-    player_hand << game_deck.pop
+    # player_hand << game_deck.pop
     dealer_hand << game_deck.pop
   end
 end
@@ -168,14 +149,50 @@ def player_stays?
   true
 end
 
+def count_aces(hand)
+  aces = 0
+  hand.each do |card|
+    card_type = card.keys.first
+    aces += 1 if card_type.include?("Ace")
+  end
+  aces
+end
+
+def calculate_ace_values(hand)
+  bust = true
+  return bust if count_aces(hand) == 0
+  hand.each do |card|
+    card_type = card.keys.first
+    card[card_type] = 1 if card_type.include?("Ace") && card[card_type] == 11
+    if calculate_total(hand) <= 21
+      bust = false
+      break
+    end
+  end
+  bust
+end
+
+def calculate_total(hand)
+  total = 0
+  hand.each do |card|
+    card_type = card.keys.first
+    total += card[card_type]
+  end
+  total
+end
+
 def player_loop(player_hand, dealer_hand, game_deck, player_done)
   loop do
-    if calculate_total(player_hand) > 21 || player_stays?
-      break
-    else
-      player_hand << game_deck.pop
+    if calculate_total(player_hand) > 21
+      bust = calculate_ace_values(player_hand)
+      break if bust
       display_table(dealer_hand, player_hand, player_done)
+      break if player_stays?
+    elsif player_stays?
+      break
     end
+    player_hand << game_deck.pop
+    display_table(dealer_hand, player_hand, player_done)
   end
   true
 end
@@ -185,9 +202,9 @@ def dealer_loop(player_hand, dealer_hand, game_deck, player_done)
 end
 
 def display_winner(player_hand, dealer_hand)
-  if (calculate_total(player_hand) > calculate_total(dealer_hand))
+  if calculate_total(player_hand) > calculate_total(dealer_hand)
     puts "Player wins!"
-  elsif (calculate_total(player_hand) == calculate_total(dealer_hand))
+  elsif calculate_total(player_hand) == calculate_total(dealer_hand)
     puts "It's a tie!"
   else
     puts "Dealer wins!"

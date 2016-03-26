@@ -1,4 +1,5 @@
 # twentyone.rb
+
 # Rules of Twenty-One
 #
 # You start with a normal 52-card deck consisting of the 4 suits (hearts, diamonds, clubs, and spades), and 13 values (2, 3, 4, 5, 6, 7, 8, 9, 10, jack, queen, king, ace).
@@ -81,34 +82,53 @@ NEW_DECK = [{ "Ace of Hearts" => 11 },
             { "Queen of Diamonds" => 10 },
             { "King of Diamonds" => 10 }].freeze
 
+DISPLAY_OFFSET = "       "
+
 player_hand = []
 dealer_hand = []
+
+def prompt(string = '')
+  print DISPLAY_OFFSET
+  puts "=> #{string}"
+end
+
+def print_line(string = '')
+  print DISPLAY_OFFSET
+  puts "#{string}"
+end
+
+def print_spaces
+  print DISPLAY_OFFSET
+end
 
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
 def display_table(dealer_hand, player_hand, player_done)
   system 'clear'
-  puts
-  puts "Twenty-One"
-  puts "=========="
-  puts
-  puts "Dealer Hand:"
-  puts "------------"
+  print_line
+  print_line
+  print_line
+  print_line "Twenty-One"
+  print_line "=========="
+  print_line
+  print_line "Dealer Hand:"
+  print_line "------------"
   dealer_total = calculate_dealer_total(dealer_hand, player_done)
   display_dealer_hand(dealer_hand, dealer_total, player_done)
-  puts
-  puts
-  puts "Player Hand:"
-  puts "------------"
+  print_line
+  print_line
+  print_line "Player Hand:"
+  print_line "------------"
   player_total = calculate_total(player_hand)
   display_hand(player_hand, "Player", player_total)
-  puts
-  puts
+  print_line
+  print_line
 end
 # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
 def display_hand(hand, name, total)
-  hand.each { |card| puts "#{card.keys.first}.to_s" }
-  puts "#{name} total = #{total}"
+  hand.each { |card| print_line "#{card.keys.first}" }
+  print_line "-----------------"
+  print_line "#{name} total = #{total}"
 end
 
 def shuffle_new_deck
@@ -125,25 +145,14 @@ def calculate_dealer_total(dealer_hand, player_done)
 end
 
 def display_dealer_hand(dealer_hand, dealer_total, player_done)
-  if !player_done
-    dealer_hand = [dealer_hand[0]]
-  end
-  display_hand(dealer_hand, "Dealer", dealer_total)
-end
-
-def deal_first_cards(game_deck, player_hand, dealer_hand)
-  # For testing
-  player_hand << { "Ace of Hearts" => 11 }
-  player_hand << { "Two of Clubs" => 2 }
-
-  2.times do
-    # player_hand << game_deck.pop
-    dealer_hand << game_deck.pop
-  end
+  hand = []
+  !player_done ? hand << dealer_hand[0] : hand = dealer_hand
+  display_hand(hand, "Dealer", dealer_total)
 end
 
 def player_stays?
-  puts "Spacebar to hit, any other key to stay."
+  prompt "Spacebar to hit, any other key to stay."
+  print_spaces
   input = gets.chomp
   return false if input[0] == " "
   true
@@ -197,33 +206,72 @@ def player_loop(player_hand, dealer_hand, game_deck, player_done)
   true
 end
 
-def dealer_loop(player_hand, dealer_hand, game_deck, player_done)
-  display_table(dealer_hand, player_hand, player_done)
+def dealer_loop(player_hand, dealer_hand, game_deck)
+  loop do
+    if calculate_total(dealer_hand) > 21
+      bust = calculate_ace_values(dealer_hand)
+      break if bust
+    elsif
+      calculate_total(dealer_hand) >= 17 && calculate_total(dealer_hand) <= 21
+      break
+    else
+     dealer_hand << game_deck.pop
+    end
+    display_table(dealer_hand, player_hand, true)
+  end
+  true
 end
 
 def display_winner(player_hand, dealer_hand)
   if calculate_total(player_hand) > calculate_total(dealer_hand)
-    puts "Player wins!"
+    print_line "Player wins!"
   elsif calculate_total(player_hand) == calculate_total(dealer_hand)
-    puts "It's a tie!"
+    print_line "It's a tie!"
   else
-    puts "Dealer wins!"
+    print_line "Dealer wins!"
   end
 end
 
-player_done = false
-game_deck = shuffle_new_deck
-deal_first_cards(game_deck, player_hand, dealer_hand)
+def deal_first_cards(game_deck, player_hand, dealer_hand)
+  # For testing purposes:
+  # player_hand << { "Ace of Hearts" => 11 }
+  # player_hand << { "Two of Clubs" => 2 }
+  #
+  # dealer_hand << { "Ace of Hearts" => 11 }
+  # dealer_hand << { "Ace of Clubs" => 11 }
+  # dealer_hand << { "Ace of Diamonds" => 11 }
+  # dealer_hand << { "Ace of Spades" => 11 }
+
+  2.times do
+    player_hand << game_deck.pop
+    dealer_hand << game_deck.pop
+  end
+end
 
 loop do
+  player_hand = []
+  dealer_hand = []
+  player_done = false
+
+  game_deck = shuffle_new_deck
+  deal_first_cards(game_deck, player_hand, dealer_hand)
   display_table(dealer_hand, player_hand, player_done)
+
   player_done = player_loop(player_hand, dealer_hand, game_deck, player_done)
   if player_done && calculate_total(player_hand) <= 21
-    dealer_loop(player_hand, dealer_hand, game_deck, player_done)
-    display_winner(player_hand, dealer_hand)
-    break
+    display_table(dealer_hand, player_hand, player_done)
+    dealer_done = dealer_loop(player_hand, dealer_hand, game_deck)
+    if dealer_done && calculate_total(dealer_hand) <= 21
+      display_winner(player_hand, dealer_hand)
+    else
+      print_line "Dealer bust. Player wins!"
+    end
+  else
+    print_line "Player bust. Dealer wins!"
   end
-
-  puts "Player went bust! Dealer wins!"
-  break
+  print_line
+  prompt "Play again? Enter to to play again, 'n' to stop."
+  print_spaces
+  continue = gets.chomp.downcase
+  break if continue.start_with?("n")
 end

@@ -260,3 +260,6 @@ loop do
   continue = gets.chomp.downcase
   break if continue.start_with?("s")
 end
+
+print_line
+prompt "Thanks for playing Twenty-One! Until next time ..."

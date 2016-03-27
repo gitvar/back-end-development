@@ -1,5 +1,8 @@
 # twentyone.rb
 
+DEALER_MAX = 17
+DISPLAY_OFFSET = "            ".freeze
+
 RANKS = %w(Ace 2 3 4 5 6 7 8 9 10 Jack Queen King).freeze
 SUITS = %w(Hearts Spades Clubs Diamonds).freeze
 
@@ -15,12 +18,6 @@ def create_deck
   end
   deck
 end
-
-DEALER_MAX = 17
-DISPLAY_OFFSET = "            ".freeze
-
-player_hand = []
-dealer_hand = []
 
 def prompt(message = '')
   print DISPLAY_OFFSET

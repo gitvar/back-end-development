@@ -115,7 +115,7 @@ end
 def display_hand(hand, name, total)
   hand.each { |card| print_line card.keys.first.to_s }
   print_line "-----------------"
-  busted?(hand) ? label = ": Bust!" : label = ''
+  label = busted?(hand) ? ": Bust!" : ''
   print_line "#{name} total = #{total} #{label}"
 end
 

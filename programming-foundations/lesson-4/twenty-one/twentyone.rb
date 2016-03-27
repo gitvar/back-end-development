@@ -80,8 +80,9 @@ NEW_DECK = [{ "Ace of Hearts" => 11 },
             { "Queen of Diamonds" => 10 },
             { "King of Diamonds" => 10 }].freeze
 
+DEALER_MAX = 17
 DISPLAY_OFFSET = "            ".freeze
-TEST = false
+TEST_ACE_CALCS = false
 
 player_hand = []
 dealer_hand = []
@@ -91,13 +92,16 @@ def prompt(message = '')
   puts "=> #{message}"
 end
 
-def print_line(message = '')
-  print DISPLAY_OFFSET
-  puts message.to_s
+def print_line(message = '', n = 1)
+  n.times do
+    print DISPLAY_OFFSET
+    puts message.to_s
+  end
 end
 
-def print_spaces
+def print_spaces(symbol = '')
   print DISPLAY_OFFSET
+  print symbol + " "
 end
 
 # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
@@ -111,13 +115,13 @@ def display_table(dealer_hand, player_hand, player_done)
   print_line
   print_line "Dealer Hand:"
   print_line "------------"
-  dealer_total = calculate_dealer_total(dealer_hand, player_done)
+  dealer_total = initial_dealer_total(dealer_hand, player_done)
   display_dealer_hand(dealer_hand, dealer_total, player_done)
   print_line
   print_line
   print_line "Player Hand:"
   print_line "------------"
-  player_total = calculate_total(player_hand)
+  player_total = total(player_hand)
   display_hand(player_hand, "Player", player_total)
   print_line
   print_line
@@ -137,16 +141,25 @@ def display_dealer_hand(dealer_hand, dealer_total, player_done)
 end
 
 def display_winner(player_hand, dealer_hand)
-  if calculate_total(player_hand) > calculate_total(dealer_hand)
-    print_line "Player wins!"
-  elsif calculate_total(player_hand) == calculate_total(dealer_hand)
-    print_line "It's a tie!"
+  if busted?(player_hand)
+    print_line "****** DEALER WINS! ******"
+  elsif busted?(dealer_hand)
+    print_line "****** PLAYER WINS! ******"
+  elsif total(player_hand) < total(dealer_hand)
+    print_line "****** DEALER WINS! ******"
+  elsif total(player_hand) > total(dealer_hand)
+    print_line "****** PLAYER WINS! ******"
   else
-    print_line "Dealer wins!"
+    print_line "It's a PUSH! Nobody wins."
   end
+  print_line(" ", 2)
 end
 
-def count_aces(hand)
+def busted?(hand)
+  total(hand) > 21 ? true : false
+end
+
+def ace_count(hand)
   hand.count { |card| card.keys.first.include?("Ace") }
   # aces = 0
   # hand.each do |card|
@@ -156,44 +169,45 @@ def count_aces(hand)
   # aces
 end
 
-def calculate_ace_values(hand)
-  bust = true
-  return bust if count_aces(hand) == 0
+def bust_after_aces_recalc?(hand)
+  return true if ace_count(hand) == 0
   hand.each do |card|
     card_type = card.keys.first
     card[card_type] = 1 if card_type.include?("Ace") && card[card_type] == 11
-    if calculate_total(hand) <= 21
-      bust = false
-      break
-    end
+    return false if !busted?(hand)
   end
-  bust
+  true
 end
 
-def calculate_total(hand)
-  total = 0
+def total(hand)
+  hand_total = 0
   hand.each do |card|
     card_type = card.keys.first
-    total += card[card_type]
+    hand_total += card[card_type]
   end
-  total
+  hand_total
 end
 
-def calculate_dealer_total(dealer_hand, player_done)
+def initial_dealer_total(dealer_hand, player_done)
   if player_done
-    calculate_total(dealer_hand)
+    total(dealer_hand)
   else
     card_type = dealer_hand[0].keys.first
     dealer_hand[0][card_type]
   end
 end
 
+def dealer_max_reached?(hand)
+  total(hand) >= DEALER_MAX ? true : false
+end
+
 def dealer_loop(player_hand, dealer_hand, game_deck)
   loop do
-    if calculate_total(dealer_hand) > 21
-      bust = calculate_ace_values(dealer_hand)
-      break if bust
-    elsif calculate_total(dealer_hand) >= 17 && calculate_total(dealer_hand) <= 21
+    if busted?(dealer_hand)
+      break if bust_after_aces_recalc?(dealer_hand)
+    elsif dealer_max_reached?(dealer_hand)
+      break
+    elsif total(dealer_hand) > total(player_hand)
       break
     else
       dealer_hand << game_deck.pop
@@ -205,7 +219,7 @@ end
 
 def player_stays?
   prompt "Enter to hit, 's' to stay."
-  print_spaces
+  print_spaces("=>")
   continue = gets.chomp.downcase
   return true if continue.start_with?('s')
   false
@@ -213,9 +227,8 @@ end
 
 def player_loop(player_hand, dealer_hand, game_deck, player_done)
   loop do
-    if calculate_total(player_hand) > 21
-      bust = calculate_ace_values(player_hand)
-      break if bust
+    if busted?(player_hand)
+      break if bust_after_aces_recalc?(player_hand)
       display_table(dealer_hand, player_hand, player_done)
       break if player_stays?
     elsif player_stays?
@@ -228,7 +241,7 @@ def player_loop(player_hand, dealer_hand, game_deck, player_done)
 end
 
 def deal_first_cards(game_deck, player_hand, dealer_hand)
-  if TEST
+  if TEST_ACE_CALCS
     player_hand << { "Ace of Hearts" => 11 }
     player_hand << { "Two of Clubs" => 2 }
     dealer_hand << { "Ace of Clubs" => 11 }
@@ -256,20 +269,14 @@ loop do
   display_table(dealer_hand, player_hand, player_done)
 
   player_done = player_loop(player_hand, dealer_hand, game_deck, player_done)
-  if player_done && calculate_total(player_hand) <= 21
+  if player_done && !busted?(player_hand)
     display_table(dealer_hand, player_hand, player_done)
-    dealer_done = dealer_loop(player_hand, dealer_hand, game_deck)
-    if dealer_done && calculate_total(dealer_hand) <= 21
-      display_winner(player_hand, dealer_hand)
-    else
-      print_line "Dealer bust. Player wins!"
-    end
-  else
-    print_line "Player bust. Dealer wins!"
+    dealer_loop(player_hand, dealer_hand, game_deck)
   end
-  print_line
+  display_winner(player_hand, dealer_hand)
+
   prompt "Enter to play again, 's' to stop."
-  print_spaces
+  print_spaces("=>")
   continue = gets.chomp.downcase
   break if continue.start_with?("s")
 end

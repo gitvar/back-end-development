@@ -3,7 +3,7 @@
 VALUES = %w(2 3 4 5 6 7 8 9 10 Jack Queen King Ace).freeze
 SUITS = %w(Hearts Spades Clubs Diamonds).freeze
 DEALER_MAX = 17
-DISPLAY_OFFSET = "              ".freeze
+DISPLAY_OFFSET = "               ".freeze
 
 def create_deck
   card_parts = VALUES.product(SUITS)

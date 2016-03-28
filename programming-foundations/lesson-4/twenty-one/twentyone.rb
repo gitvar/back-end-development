@@ -3,20 +3,20 @@
 DEALER_MAX = 17
 DISPLAY_OFFSET = "            ".freeze
 
-RANKS = %w(Ace 2 3 4 5 6 7 8 9 10 Jack Queen King).freeze
+VALUES = %w(2 3 4 5 6 7 8 9 10 Jack Queen King Ace).freeze
 SUITS = %w(Hearts Spades Clubs Diamonds).freeze
 
 def create_deck
-  deck = []
-  SUITS.each do |suit|
-    RANKS.each do |rank|
-      value = rank
-      value = 10 if %w(Jack Queen King Ace).include? rank
-      value += 1 if rank == "Ace"
-      deck << { "#{rank} of #{suit}" => value.to_i }
-    end
+  card_parts = VALUES.product(SUITS)
+  new_deck = []
+  card_parts.each do |card_part|
+    key = "#{card_part[0]} of #{card_part[1]}"
+    value = card_part[0].to_i
+    value = 10 if %w(Jack Queen King).include?(key.split[0])
+    value = 11 if key.include?("Ace")
+    new_deck << { key => value.to_i }
   end
-  deck
+  new_deck.shuffle
 end
 
 def prompt(message = '')

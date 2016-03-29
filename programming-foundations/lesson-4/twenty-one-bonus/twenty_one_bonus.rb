@@ -1,15 +1,18 @@
 # twenty_one_bonus.rb
 # Launch School's twentyone.rb used for the bonus assignments.
 
+require 'pry'
+
 # Question 5: Constants added,
-WINNING_TOTAL = 21
-DEALER_MAX = 17
+WINNING_TOTAL = 21 # Name of the game!
+DEALER_MAX = 17 # Dealer stays when total >= 17
+MAX_POINTS = 5 # First to 5 points win the match.
 
 SUITS = ['H', 'D', 'S', 'C']
 VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 
 def prompt(msg)
-  puts "=> #{msg}"
+  msg == "blank" ? (puts " ") :(puts "=> #{msg}")
 end
 
 def initialize_deck
@@ -61,10 +64,21 @@ def detect_result(dealer_cards, player_cards)
   end
 end
 
-def display_result(dealer_cards, player_cards)
-  compare_cards(player_cards, dealer_cards)
-  result = detect_result(dealer_cards, player_cards)
+def display_points(points = [0,0], no_of_games = 0)
+  player = 0
+  dealer = 1
+  if points.include?(MAX_POINTS)
+    points[player] == MAX_POINTS ? winner = "You" : winner = "the Dealer"
+    prompt "The winner, with a total of #{MAX_POINTS} points, is: #{winner}!"
+  else
+    prompt "Your score after #{no_of_games} games is #{points[player]}."
+    prompt "Dealer score after #{no_of_games} games is #{points[dealer]}."
+  end
+end
 
+def display_result(dealer_cards, player_cards, no_of_games = 0, points = [0, 0])
+  display_compare_cards(player_cards, dealer_cards)
+  result = detect_result(dealer_cards, player_cards)
   case result
   when :player_busted
     prompt "You busted! Dealer wins!"
@@ -77,23 +91,51 @@ def display_result(dealer_cards, player_cards)
   when :tie
     prompt "It's a tie!"
   end
+
+  points = update_points(dealer_cards, player_cards, no_of_games, points)
+  display_points(points, no_of_games)
+end
+
+# Question 4: Add score (best of 5 games)
+def update_points(dealer_cards, player_cards, no_of_games = 0, points = [0, 0])
+  player = 0
+  dealer = 1
+  result = detect_result(dealer_cards, player_cards)
+  case result
+  when :player_busted
+    points[dealer] += 1
+  when :dealer_busted
+    points[player] += 1
+  when :player
+    points[player] += 1
+  when :dealer
+    points[dealer] += 1
+  end
+
+  points
 end
 
 def play_again?
   puts "-------------"
+  prompt("blank")
   prompt "Do you want to play again? (y or n)"
   answer = gets.chomp
   answer.downcase.start_with?('y')
 end
 
 # Question 3: Extract "compare_cards" code to method.
-def compare_cards(player_cards, dealer_cards)
+def display_compare_cards(player_cards, dealer_cards)
   # compare cards!
   puts "=============="
   prompt "Dealer has #{dealer_cards}, for a total of: #{total(dealer_cards)}"
   prompt "Player has #{player_cards}, for a total of: #{total(player_cards)}"
   puts "=============="
 end
+
+
+# initialze vars:
+number_of_games = 0
+points = [0, 0]
 
 loop do
   system 'clear'
@@ -104,14 +146,23 @@ loop do
   player_cards = []
   dealer_cards = []
 
+  # initialize score and game count
+  if points.include?(MAX_POINTS)
+    number_of_games = 0
+    points = [0, 0]
+  end
+
   # initial deal
   2.times do
     player_cards << deck.pop
     dealer_cards << deck.pop
   end
 
+  number_of_games += 1
+
   prompt "Dealer has #{dealer_cards[0]} and ?"
   prompt "You have: #{player_cards[0]} and #{player_cards[1]}, for a total of #{total(player_cards)}."
+  prompt "blank"
 
   # player turn
   loop do
@@ -134,7 +185,7 @@ loop do
   end
 
   if busted?(player_cards)
-    display_result(dealer_cards, player_cards)
+    display_result(dealer_cards, player_cards, number_of_games, points)
     play_again? ? next : break
   else
     prompt "You stayed at #{total(player_cards)}"
@@ -155,21 +206,13 @@ loop do
   dealer_total = total(dealer_cards)
   if busted?(dealer_cards)
     prompt "Dealer total is now: #{dealer_total}"
-    display_result(dealer_cards, player_cards)
+    display_result(dealer_cards, player_cards, number_of_games, points)
     play_again? ? next : break
   else
     prompt "Dealer stays at #{dealer_total}"
   end
 
-  # Extract to "compare_cards" method.
-  # # both player and dealer stays - compare cards!
-  # puts "=============="
-  # prompt "Dealer has #{dealer_cards}, for a total of: #{total(dealer_cards)}"
-  # prompt "Player has #{player_cards}, for a total of: #{total(player_cards)}"
-  # puts "=============="
-
-  display_result(dealer_cards, player_cards)
-
+  display_result(dealer_cards, player_cards, number_of_games, points)
   break unless play_again?
   # This call to play_again? is different because the result has only one effect (if false, then break out of the main loop). Otherwise nothing. The program is already at the end of the loop and a new iteration through the main loop will start automatically if play_again? returns true. Thus no need for a ternary operation and the "next" command.
 end

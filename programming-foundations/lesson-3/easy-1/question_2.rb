@@ -8,7 +8,11 @@
 # It can also indicate 'NOT' (opposite in boolean). For example: if !open ... (indicating that if the boolean variable 'open' is false, the rest of the if statement will be executed).
 # Can also be used as 'not equal to' symbol: if variable_1 != 10 ...
 
-# ?: When used with a method eg. 'light_is_on?(light_1)'. it indicates that the method will/should return a boolean value (true or false).
+# !!: This can be placed in front of a return variable (at the end of a method) to force the method to return true or false.
+#     See also the note below (same thing but not just return varaibles): Double Not. !!username [true -> false - > true].
+
+# ?: When used with a method eg. 'light_is_on?(light_1)'. it indicates that the method will/should return a boolean value (true or false). 
+#    These type of methods should also NOT change any program variables. just return true or false.
 
 1. what is != and where should you use it?
 'Signify "not equal to". Use in if statement:'

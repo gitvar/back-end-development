@@ -12,7 +12,7 @@ LANGUAGE = 'af'
 # output. Remember that Kernel.gets() includes the newline, so you have to call chomp() to remove
 # it: Kernel.gets().chomp().
 
-require 'pry'
+# require 'pry'
 require 'yaml'
 
 case LANGUAGE

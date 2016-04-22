@@ -1,9 +1,11 @@
 # Fix this code because:
 # You're not returning a false condition,
 # Not handling the case that there are more or fewer than 4 components to the IP address (e.g. "4.5.5" or "1.2.3.4.5" should be invalid)."
+require "pry"
 
 def is_a_number?(str)
-  !!str.match(/^(\d)+$/)
+  Integer(str)
+  # binding.pry
 end
 
 def dot_separated_ip_address?(input_string)
@@ -20,4 +22,5 @@ def dot_separated_ip_address?(input_string)
   false
 end
 
-p dot_separated_ip_address?("192.0.0.256")
+ip_addr = "192.200.0.255"
+p "The ip address #{ip_addr} is valid: #{dot_separated_ip_address?(ip_addr)}"

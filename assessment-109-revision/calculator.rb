@@ -39,7 +39,7 @@ loop do
       prompt "Please try again. That was not a valid number."
     end
   end
-  
+
   loop do
     prompt "#{name}, please enter the second of the 2 numbers:"
     number2 = gets.chomp
@@ -49,9 +49,9 @@ loop do
       prompt "Please try again. That was not a valid number."
     end
   end
-  
+
   prompt
-  
+
   loop do
     prompt "Which operation is to be performed: \n1. Addition\n2. Subtraction\n3. Multiplication\n4. Division"
     operation = gets.chomp.to_i
@@ -61,19 +61,19 @@ loop do
       prompt "Not a valid choice! Try again."
     end
   end
-  
+
   answer =  case operation
             when 1 then number1.to_f + number2.to_f
             when 2 then number1.to_f - number2.to_f
             when 3 then number1.to_f * number2.to_f
             else        number1.to_f / number2.to_f
             end
-  
-  answer = format('%.2f', answer)            
+
+  answer = format('%.2f', answer)
   prompt
   prompt "#{name}, the result of #{OPERATIONS[operation]} #{number1} with #{number2} is #{answer}"
   prompt
-  
+
   prompt "Do you want to do another calculation? (Yes or No)"
   another_operation = gets.chomp
   break if another_operation.downcase.start_with?("n")

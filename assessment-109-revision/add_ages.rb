@@ -3,5 +3,3 @@ ages = { "Herman" => 32, "Lily" => 30, "Grandpa" => 5843, "Eddie" => 10, "Marily
 total = 0
 ages.each { |_, age| total += age }
 p total
-
-total = ages.values.reduce(:+)

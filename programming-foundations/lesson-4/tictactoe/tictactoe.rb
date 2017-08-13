@@ -54,9 +54,7 @@ def initialize_board
 end
 
 def empty_squares(brd)
-  # binding.pry
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
-  # returns an array of keys pointing to INITIAL_MARKER values (empty spaces).
 end
 
 def player_places_piece!(brd)

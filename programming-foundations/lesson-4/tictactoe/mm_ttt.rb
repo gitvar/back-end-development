@@ -1,5 +1,18 @@
 # ttt_bonus_6.rb
 
+# 1. Display the initial empty 3x3 board.
+# 2. Ask the user to mark a square.
+# 3. Calculate best move for computer via minimax method.
+# 4. Computer marks a square.
+# 5. Display the updated board state.
+# 6. If winner, display winner.
+# 7. If one square left for player, place player marker, goto #5
+# 8. If board is full, display tie.
+# 9. If neither winner nor board is full, go to #2
+# 10. Play again?
+# 11. If yes, go to #1
+# 12. Good bye!
+
 INITIAL_MARKER = ' '.freeze
 PLAYER_MARKER = 'X'.freeze
 COMPUTER_MARKER = 'O'.freeze
@@ -14,7 +27,7 @@ DISPLAY_DOUBLE_UNDERLINE = '================='.freeze
 
 PLAYER = 0
 COMPUTER = 1
-MAX_SCORE = 2
+MAX_SCORE = 1
 
 FIRST_TO_MOVE_CHOICES = ["Player", "Computer", "Choose", "Random"].freeze
 FIRST_TO_MOVE = "Choose".freeze
@@ -86,10 +99,6 @@ def joinor(empty_squares_array, separator = ', ', end_word = 'or')
   empty_squares_array[-1] = "#{end_word} #{empty_squares_array.last}" if empty_squares_array.size > 1
   empty_squares_array.join(separator)
 end
-# Bonus Feature 1:
-# joinor([1, 2, 3])                # => "1, 2, or 3"
-# joinor([1, 2, 3], '; ')          # => "1; 2; or 3"
-# joinor([1, 2, 3], ', ', 'and')   # => "1, 2, and 3"
 
 def player_places_piece(brd)
   square = ''
@@ -117,6 +126,10 @@ def find_square(brd, marker)
   square
 end
 
+def minimax_square(board)
+  empty_squares(board).sample
+end
+
 def computer_places_piece(brd)
   # If computer has 2 places in winning line, make it 3, if 3rd place is open.
   marker = COMPUTER_MARKER
@@ -128,8 +141,10 @@ def computer_places_piece(brd)
   if !square # Else, check if position 5 is empty
     square = if brd[5] == INITIAL_MARKER
       5
-    else # Else, pick a random open space for the computer piece
-      empty_squares(brd).sample
+    else # Else, pick a best MM square for the computer piece
+      minimax_square(brd)
+      # else # Else, pick a random open space for the computer piece
+      #   empty_squares(brd).sample
     end
   end
   brd[square] = COMPUTER_MARKER
@@ -195,6 +210,15 @@ def alternate_player(current_player)
   current_player == "Player" ? "Computer" : "Player"
 end
 
+def last_open_square(brd)
+  last_open_square = nil
+  open_squares = brd.keys.select { |num| brd[num] == INITIAL_MARKER }
+  if open_squares.count == 1
+    last_open_square = open_squares[0]
+  end
+  last_open_square
+end
+
 scores = [0, 0]
 comment = ''
 display_intro_screen
@@ -204,9 +228,13 @@ loop do # Game Loop - A Game will consist of a number of Rounds until one player
   board = initialize_board
   initial_current_player = current_player
 
-  loop do # One Round Loop
+  loop do # Loop for a single Round
     display_board(board, scores)
-    place_piece(board, current_player)
+    if current_player == "Player" && last_open_square(board)
+      board[last_open_square(board)] = PLAYER_MARKER
+    else
+      place_piece(board, current_player)
+    end
     current_player = alternate_player(current_player)
     break if someone_won?(board) || board_full?(board)
   end
